@@ -1,14 +1,9 @@
-import Link from "next/link";
-import ProductCard from "./components/ProductCard";
-
 export default function Home() {
     return (
-        <main className="flex flex-col justify-center items-center h-screen">
-            <h1 className="mb-2">Welcome to Home page</h1>
-            <Link href="/users" className="text-blue-500">
-                Go to Users page
-            </Link>
-            <ProductCard />
-        </main>
+        <div>
+            <h1 className="h1-bold">Next.js 13 - We are coming</h1>
+            <h2 className="h2-bold">Next.js 13 - We are coming</h2>
+            <h3 className="h3-bold">Next.js 13 - We are coming</h3>
+        </div>
     );
 }
