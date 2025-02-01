@@ -4,15 +4,15 @@ const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
 
 export default clerkMiddleware(async (auth, request) => {
     const url = new URL(request.url);
-    // validating route...
-    const response = await fetch(url.origin + url.pathname, { method: "HEAD" });
 
-    // checking if requested route matches any of the defined public routes and if it exists
-    if (!isPublicRoute(request) && response.status !== 404) {
-        // If condition is satisfied, the requested route is protected until sign-up or sign-in is completed
-        await auth.protect();
+    // checking if requested route matches a protected route (i.e, inverse of public routes)
+    if (!isPublicRoute(request)) {
+        // validating route to see if it exists...
+        const response = await fetch(url.origin + url.pathname, { method: "HEAD" });
+        // If it does, requested route is protected until sign-up or sign-in is completed
+        if (response.status !== 404) await auth.protect();
     }
-    // Otherwise, the requested route is allowed to proceed unprotected
+    // But if requested route is public, it is allowed to proceed unprotected
 });
 
 export const config = {
