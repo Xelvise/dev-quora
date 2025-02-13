@@ -2,8 +2,8 @@
 // https://www.figma.com/file/2vtjgodtBxTdg0zOUHPvXh/Course-Designs?type=design&node-id=0%3A1&mode=design&t=kE2VnjGXGIiOk2PY-1
 import type { Config } from "tailwindcss";
 
-export default {
-    darkMode: ["class"],
+const config = {
+    darkMode: "class" as const,
     content: [
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -13,29 +13,30 @@ export default {
         container: {
             center: true,
             padding: "2rem",
-            screens: { "2xl": "1400px" },
+            screens: {
+                "2xl": "1400px",
+            },
         },
         extend: {
             colors: {
-                // From higher intensity to lower intensity
-                orange: {
-                    500: "#FF7000",
-                    100: "#FFF1E6",
+                primary: {
+                    "100": "#FFF1E6",
+                    "500": "#FF7000",
                 },
                 dark: {
-                    500: "#000000",
-                    400: "#0F1117",
-                    300: "#151821",
-                    200: "#212734",
-                    100: "#101012",
+                    "100": "#101012",
+                    "200": "#212734",
+                    "300": "#151821",
+                    "400": "#0F1117",
+                    "500": "#000000",
                 },
                 light: {
-                    900: "#FFFFFF",
-                    850: "#FDFDFD",
-                    800: "#F4F6F8",
-                    700: "#DCE3F1",
-                    500: "#7B8EC8",
-                    400: "#858EAD",
+                    "400": "#858EAD",
+                    "500": "#7B8EC8",
+                    "700": "#DCE3F1",
+                    "800": "#F4F6F8",
+                    "850": "#FDFDFD",
+                    "900": "#FFFFFF",
                 },
                 "accent-blue": "#1DA1F2",
             },
@@ -51,27 +52,43 @@ export default {
                 "dark-200": "2px 0px 20px 0px rgba(39, 36, 36, 0.04)",
             },
             backgroundImage: {
-                "auth-dark": "url('/assets/images/auth-dark.png')",
-                "auth-light": "url('/assets/images/auth-light.png')",
+                "auth-dark": "url(/assets/images/auth-dark.png)",
+                "auth-light": "url(/assets/images/auth-light.png)",
             },
             screens: {
                 xs: "420px",
             },
             keyframes: {
                 "accordion-down": {
-                    from: { height: "0" },
-                    to: { height: "var(--radix-accordion-content-height)" },
+                    from: {
+                        height: "0",
+                    },
+                    to: {
+                        height: "var(--radix-accordion-content-height)",
+                    },
                 },
                 "accordion-up": {
-                    from: { height: "var(--radix-accordion-content-height)" },
-                    to: { height: "0" },
+                    from: {
+                        height: "var(--radix-accordion-content-height)",
+                    },
+                    to: {
+                        height: "0",
+                    },
                 },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
             },
+            borderRadius: {
+                lg: "var(--radius)",
+                md: "calc(var(--radius) - 2px)",
+                sm: "calc(var(--radius) - 4px)",
+            },
         },
     },
+
     plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
-} satisfies Config;
+};
+
+export default config satisfies Config;

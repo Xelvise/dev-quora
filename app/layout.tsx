@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "@/context/ThemeProvider";
+import ThemeProvider from "@/contexts/ThemeProvider";
 
 // prettier-ignore
 export const metadata: Metadata = {
-    title: "DevFlow",
+    title: "DevQuora",
     description: "A community-driven platform for asking and answering programming questions. Get help, share knowledge and collaborate with developers around the world. Explore topics in Web development, mobile app development, algorithms, data structures and more.",
     icons: {
         icon: "/assets/images/site-logo.svg",
@@ -36,15 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                         },
                     }}
                 >
-                    <ThemeProvider>
-                        {/* <SignedOut>
-                                <SignInButton />
-                            </SignedOut>
-                            <SignedIn>
-                                <UserButton />
-                            </SignedIn> */}
-                        {children}
-                    </ThemeProvider>
+                    <ThemeProvider>{children}</ThemeProvider>
                 </ClerkProvider>
             </body>
         </html>
