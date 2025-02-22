@@ -1,12 +1,14 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)", "/api/webhooks(.*)"]);
 
 export default clerkMiddleware(async (auth, request) => {
     const url = new URL(request.url);
 
     // checking if requested route matches a protected route (i.e, inverse of public routes)
     if (!isPublicRoute(request)) {
+        await auth.protect();
+        return;
         // validating route to see if it exists...
         const response = await fetch(url.origin + url.pathname, { method: "HEAD" });
         // If it does, requested route is protected until sign-up or sign-in is completed

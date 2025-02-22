@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "@/contexts/ThemeProvider";
+import ThemeProvider from "@/Context-Providers/ThemeProvider";
 
 // prettier-ignore
 export const metadata: Metadata = {
@@ -27,7 +27,23 @@ const spaceGrotesk = Space_Grotesk({
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en">
-            <body suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable}`}>
+            <head suppressHydrationWarning>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                const savedTheme = localStorage.getItem('theme') || 'dark';
+                                if (savedTheme === 'dark') {
+                                    document.documentElement.classList.add('dark');
+                                } else {
+                                    document.documentElement.classList.remove('dark');
+                                }
+                            })();
+                        `,
+                    }}
+                />
+            </head>
+            <body className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
                 <ClerkProvider
                     appearance={{
                         elements: {

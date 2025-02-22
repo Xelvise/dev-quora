@@ -47,5 +47,5 @@ next-env.d.ts
 .vscode
 
 # Redundant components
-components/shadcn/dropdown-menu*
-components/shadcn/menubar*
+Components/Shadcn/dropdown-menu*
+Components/Shadcn/menubar*
