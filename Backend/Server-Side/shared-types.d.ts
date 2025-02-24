@@ -131,7 +131,7 @@ export interface GetAllUsersParams {
 export interface UpdateUserParams {
     clerkId: string;
     updatedData: Partial<UserFormat>;
-    pathToRefetch?: string;
+    pathToRefetch?: string | string[];
 }
 
 export interface ToggleSaveQuestionParams {

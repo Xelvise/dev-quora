@@ -35,7 +35,10 @@ export async function updateUser(params: UpdateUserParams) {
         const updatedUser = await UserCollection.findOneAndUpdate<UserFormat>({ clerkId: clerkId }, updatedData, {
             new: true,
         });
-        if (pathToRefetch) revalidatePath(pathToRefetch);
+        if (pathToRefetch) {
+            if (typeof pathToRefetch === "string") revalidatePath(pathToRefetch);
+            else pathToRefetch.forEach(path => revalidatePath(path));
+        }
         return updatedUser;
     } catch (error) {
         console.error("User could not be updated", error);

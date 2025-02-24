@@ -35,7 +35,7 @@ export default function MobileSidebar() {
                     </Link>
                     <section className="flex flex-col gap-6 pt-12">
                         {sidebarLinks.map(({ imgURL, route, label }, index) => {
-                            const isSelected = pathname.includes(route) || pathname === route;
+                            const isSelected = pathname === route;
                             return (
                                 <SheetClose asChild key={index}>
                                     <SidebarNavLink
