@@ -19,7 +19,7 @@ const MetricContent = ({ imgPath, imgSize, metricValue, metricName, isAuthor, te
             width={imgSize}
             height={imgSize}
             alt={`${metricName}`}
-            className={`invert-colors ${isAuthor ? "rounded-full object-contain" : ""}`}
+            className={isAuthor ? "rounded-full object-contain" : "invert-colors"}
         />
         <div className={`flex ${isAuthor ? "gap-2" : "gap-1"} flex-nowrap items-center`}>
             <p className={`${isAuthor ? "body-regular" : "small-regular"} text-dark200_light800 whitespace-nowrap ${textStyles}`}>

@@ -31,6 +31,7 @@ export default function QuestionCard({ question }: { question: QuestionFormat })
             <div className="flex w-full flex-wrap items-center justify-between gap-3">
                 <Metric
                     imgPath={author.picture}
+                    imgSize={30}
                     metricValue={author.name}
                     metricName={`• asked ${calcTimeDiff(createdAt)}`}
                     href={`/profile/${author._id}`}
