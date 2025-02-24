@@ -4,8 +4,13 @@ const nextConfig: NextConfig = {
     /* config options here */
     serverExternalPackages: ["mongoose"],
     experimental: {
-        // serverActions // are enabled by default from NextJS 14
         mdxRs: true,
+    },
+    images: {
+        remotePatterns: [
+            { protocol: "https", hostname: "*" },
+            { protocol: "http", hostname: "*" },
+        ],
     },
 };
 

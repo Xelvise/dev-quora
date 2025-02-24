@@ -32,12 +32,10 @@ export async function updateUser(params: UpdateUserParams) {
     try {
         await connectToDB();
         const { clerkId, updatedData, pathToRefetch } = params;
-        const updatedUser = await UserCollection.findOneAndUpdate<UserFormat>({ clerkId: clerkId }, updatedData, {
-            new: true,
-        });
+        // prettier-ignore
+        const updatedUser = await UserCollection.findOneAndUpdate<UserFormat>({ clerkId: clerkId }, updatedData, { new: true });
         if (pathToRefetch) {
-            if (typeof pathToRefetch === "string") revalidatePath(pathToRefetch);
-            else pathToRefetch.forEach(path => revalidatePath(path));
+            pathToRefetch.forEach(path => revalidatePath(path));
         }
         return updatedUser;
     } catch (error) {
