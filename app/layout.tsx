@@ -45,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </head>
             <body className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
                 <ClerkProvider
+                    afterSignOutUrl="/"
                     appearance={{
                         elements: {
                             formButtonPrimary: "primary-gradient",
