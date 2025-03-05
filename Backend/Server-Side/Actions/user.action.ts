@@ -2,19 +2,32 @@
 
 import { revalidatePath } from "next/cache";
 import UserCollection, { UserFormat } from "../../Database/user.collection";
-import connectToDB from "../database-connector";
-import { CreateUserParams, DeleteUserParams, UpdateUserParams } from "../shared-types";
+import connectToDB from "../database.connector";
+import { CreateUserParams, DeleteUserParams, GetAllUsersParams, UpdateUserParams } from "../parameters";
 import QuestionCollection from "@/Backend/Database/question.collection";
-import { Schema } from "mongoose";
 
-export async function getUserByClerkID(id: string) {
+export async function getSignedInUser(clerk_id: string | null) {
     try {
         await connectToDB();
-        const user = await UserCollection.findOne<UserFormat>({ clerkId: id });
+        const user = await UserCollection.findOne<UserFormat>({ clerkId: clerk_id });
         return user;
     } catch (error) {
         console.error("User could not be found", error);
         throw new Error("User could not be found");
+    }
+}
+
+export async function fetchUsers(params: GetAllUsersParams) {
+    const { page = 1, pageLimit, filter, searchQuery, sortBy } = params;
+    try {
+        await connectToDB();
+        const query = UserCollection.find<UserFormat>({});
+        if (pageLimit) query.limit(pageLimit);
+        const users = await query.sort({ createdAt: sortBy === "newest-to-oldest" ? -1 : 1 });
+        return { users };
+    } catch (error) {
+        console.error("Error occured while fetching Users", error);
+        throw new Error("Error occured while fetching Users");
     }
 }
 
@@ -24,45 +37,45 @@ export async function createUser(userData: CreateUserParams) {
         const newUser = await UserCollection.create(userData);
         return newUser;
     } catch (error) {
-        console.error("User could not be created", error);
+        console.error("Error occured while creating User", error);
     }
 }
 
 export async function updateUser(params: UpdateUserParams) {
+    const { clerk_id, updatedData, pathToRefetch } = params;
     try {
         await connectToDB();
-        const { clerkId, updatedData, pathToRefetch } = params;
         // prettier-ignore
-        const updatedUser = await UserCollection.findOneAndUpdate<UserFormat>({ clerkId: clerkId }, updatedData, { new: true });
+        const updatedUser = await UserCollection.findOneAndUpdate<UserFormat>({ clerkId: clerk_id }, updatedData, { new: true });
         if (pathToRefetch) {
             pathToRefetch.forEach(path => revalidatePath(path));
         }
         return updatedUser;
     } catch (error) {
-        console.error("User could not be updated", error);
+        console.error("Error occured while updating User", error);
     }
 }
 
 export async function deleteUser(params: DeleteUserParams) {
+    const { clerk_id } = params;
     try {
         await connectToDB();
-        const { clerkId } = params;
         // find User in UserCollection
-        const user = await UserCollection.findOne<UserFormat>({ clerkId: clerkId });
+        const user = await UserCollection.findOne<UserFormat>({ clerkId: clerk_id });
         if (!user) throw new Error("User not found");
-
-        // While referencing User's objectId, delete all User-associated questions
-        await QuestionCollection.deleteMany({ author: user._id });
 
         // Using objectIds of User's questions, find & delete all User-associated answers, comments, upvotes, etc.
         // prettier-ignore
-        const userQuestionIDs = await QuestionCollection.find({ author: user._id }).distinct("_id") as Schema.Types.ObjectId[];
+        const userQuestionIDs = await QuestionCollection.find<UserFormat>({ author: user._id }).distinct("_id")
         // TODO ...
+
+        // While referencing User's objectId, delete all User-associated questions
+        await QuestionCollection.deleteMany({ author: user._id });
 
         // finally delete the User
         const deletedUser = await UserCollection.findByIdAndDelete(user._id);
         return deletedUser;
     } catch (error) {
-        console.error("User could not be deleted", error);
+        console.error("Error occured while deleting User", error);
     }
 }

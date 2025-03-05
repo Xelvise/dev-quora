@@ -11,8 +11,7 @@ interface Props {
     textStyles?: string;
 }
 
-const MetricContent = ({ imgPath, imgSize, metricValue, metricName, isAuthor, textStyles }: Props) =>
-    // prettier-ignore
+const MetricContent = ({ imgPath, imgSize, metricValue, metricName, isAuthor, textStyles }: Props) => (
     <div className="flex items-center gap-1.5">
         <Image
             src={imgPath}
@@ -21,15 +20,21 @@ const MetricContent = ({ imgPath, imgSize, metricValue, metricName, isAuthor, te
             alt={`${metricName}`}
             className={isAuthor ? "rounded-full object-contain" : "invert-colors"}
         />
+        {/* prettier-ignore */}
         <div className={`flex ${isAuthor ? "gap-2" : "gap-1"} flex-nowrap items-center`}>
-            <p className={`${isAuthor ? "body-regular" : "small-regular"} text-dark200_light800 whitespace-nowrap ${textStyles}`}>
-                {metricValue}
-            </p>
-            <p className={`${isAuthor ? "max-sm:hidden" : ""} small-regular text-dark200_light800 cursor-text whitespace-nowrap ${textStyles}`}>
-                {metricName}
-            </p>
+            {metricValue && (
+                <p className={`${isAuthor ? "body-regular" : "small-regular"} text-dark200_light800 whitespace-nowrap ${textStyles}`}>
+                    {metricValue}
+                </p>
+            )}
+            {metricName && (
+                <p className={`${isAuthor ? "max-sm:hidden" : ""} small-regular text-dark200_light800 cursor-text whitespace-nowrap ${textStyles}`}>
+                    {metricName}
+                </p>
+            )}
         </div>
-    </div>;
+    </div>
+);
 
 // prettier-ignore
 export default function Metric({ imgPath, imgSize = 16, metricValue, metricName, href, isAuthor, textStyles = "" }: Props) {

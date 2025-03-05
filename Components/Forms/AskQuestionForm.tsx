@@ -15,42 +15,43 @@ import Image from "next/image";
 import { tinyPlugins, tinyToolbar } from "@/Constants/tiny-config";
 import { Spinner } from "../Shadcn/spinner";
 import { createQuestion } from "@/Backend/Server-Side/Actions/question.action";
-
-export const FormSchema = z.object({
-    title: z.string().min(5).max(130),
-    explanation: z.string().min(100),
-    tags: z.array(z.string().min(1).max(15)).min(1).max(3),
-});
+import { UserFormat } from "@/Backend/Database/user.collection";
+import { QuestionSchema } from "./FormSchemas";
+import { useTheme } from "@/Context-Providers/ThemeProvider";
 
 interface Props {
     formType?: "update" | "create";
-    userObjectId: string;
+    user_id: string | null;
 }
 
-export default function AskQuestionForm({ formType = "create", userObjectId }: Props) {
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+export default function AskQuestionForm({ formType = "create", user_id }: Props) {
+    const { mode } = useTheme();
+
+    const form = useForm<z.infer<typeof QuestionSchema>>({
+        resolver: zodResolver(QuestionSchema),
         defaultValues: { tags: [], title: "", explanation: "" },
     });
     const editorRef = useRef<Editor | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const onSubmitForm = async (values: z.infer<typeof FormSchema>) => {
+    const onSubmitForm = async (data: z.infer<typeof QuestionSchema>) => {
         setIsSubmitting(true);
         // Call a server action to create a question
         try {
+            if (!user_id) throw new Error("Something went wrong. Kindly Sign-in");
             await createQuestion({
-                title: values.title,
-                content: values.explanation,
-                tags: values.tags,
-                author: JSON.parse(userObjectId),
+                title: data.title,
+                content: data.explanation,
+                tags: data.tags,
+                author_id: user_id,
                 pathToRefetch: "/",
             });
-            form.setValue("title", "");
-            form.setValue("explanation", "");
-            form.setValue("tags", []);
+            form.reset();
+            // @ts-ignore
+            if (editorRef.current) editorRef.current.setContent("");
         } catch (error) {
-            if (error instanceof Error && error.message === "Failed to create question") {
+            console.error("Question could not be created");
+            if (error instanceof Error) {
                 // TODO: Add a toast notification to inform the user about the error
             }
         } finally {
@@ -71,7 +72,7 @@ export default function AskQuestionForm({ formType = "create", userObjectId }: P
                         return form.setError("tags", { type: "maxLength", message: "Tag must be less than 15 characters" });
                     }
                     // if tag doesn't already exists or hasn't been added, then append tag to field.value
-                    if (!form.getValues("tags").includes(tagValue as never)) {
+                    if (!form.getValues("tags").includes(tagValue)) {
                         form.setValue("tags", [...form.getValues("tags"), tagValue]);
                         // empty the input field and clear errors after adding the tag
                         tagElement.value = "";
@@ -96,7 +97,7 @@ export default function AskQuestionForm({ formType = "create", userObjectId }: P
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitForm)} className="flex flex-1 flex-col gap-10">
+            <form className="flex flex-1 flex-col gap-7" onSubmit={form.handleSubmit(onSubmitForm)}>
                 <FormField
                     control={form.control}
                     name="title"
@@ -141,6 +142,8 @@ export default function AskQuestionForm({ formType = "create", userObjectId }: P
                                         plugins: tinyPlugins,
                                         toolbar: tinyToolbar,
                                         content_style: "body { font-family:Inter; font-size:16px; }",
+                                        skin: mode === "light" ? "oxide" : "oxide-dark",
+                                        content_css: mode === "light" ? "light" : "dark",
                                         highlight_on_focus: false,
                                     }}
                                 />

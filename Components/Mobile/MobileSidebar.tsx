@@ -9,12 +9,14 @@ import { Button } from "../Shadcn/button";
 import { sidebarLinks } from "@/Constants";
 import { usePathname } from "next/navigation";
 import SidebarNavLink from "../Shared/SidebarNavLink";
+import { useState } from "react";
 
 export default function MobileSidebar() {
     const pathname = usePathname();
+    const [open, setOpen] = useState(false);
 
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 <Image
                     src="/assets/icons/hamburger.svg"
@@ -25,7 +27,7 @@ export default function MobileSidebar() {
                 />
             </SheetTrigger>
 
-            <SheetContent side="left" className="bg-light900_dark400 flex flex-col justify-between border-none">
+            <SheetContent side="right" className="bg-light900_dark400 flex flex-col justify-between border-none">
                 <SheetHeader>
                     <Link href="/" className="flex items-center gap-1">
                         <Image src="/assets/images/site-logo.svg" width={23} height={23} alt="DevQuora" />
@@ -37,32 +39,32 @@ export default function MobileSidebar() {
                         {sidebarLinks.map(({ imgURL, route, label }, index) => {
                             const isSelected = pathname === route;
                             return (
-                                <SheetClose asChild key={index}>
-                                    <SidebarNavLink
-                                        imgURL={imgURL}
-                                        route={route}
-                                        label={label}
-                                        isSelected={isSelected}
-                                        imgSize={20}
-                                    />
-                                </SheetClose>
+                                <SidebarNavLink
+                                    key={index}
+                                    imgURL={imgURL}
+                                    route={route}
+                                    label={label}
+                                    isSelected={isSelected}
+                                    imgSize={20}
+                                    sidebarUpdateFn={setOpen}
+                                />
                             );
                         })}
                     </section>
                 </SheetHeader>
 
                 <SignedOut>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col items-center gap-3">
                         <SheetClose asChild>
                             <Link href="/sign-in">
-                                <Button className="base-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
+                                <Button className="base-medium min-h-[41px] w-fit rounded-[10px] px-16 py-4 shadow-none">
                                     <span className="primary-text-gradient">Log In</span>
                                 </Button>
                             </Link>
                         </SheetClose>
                         <SheetClose asChild>
                             <Link href="/sign-up">
-                                <Button className="base-medium light-border-2 btn-tertiary text-dark200_light900 min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
+                                <Button className="base-medium solid-light-border btn-tertiary text-dark200_light900 min-h-[41px] w-fit rounded-[10px] px-16 py-4 shadow-none">
                                     Sign Up
                                 </Button>
                             </Link>

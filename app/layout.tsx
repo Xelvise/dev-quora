@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import "./prism.css";
 import ThemeProvider from "@/Context-Providers/ThemeProvider";
 
 // prettier-ignore

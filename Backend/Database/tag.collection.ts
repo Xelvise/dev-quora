@@ -7,22 +7,22 @@ import { UserFormat } from "./user.collection";
 
 interface TagStructure extends Document {
     name: string;
-    desc: string;
+    desc?: string;
     questions: Schema.Types.ObjectId[];
     followers: Schema.Types.ObjectId[];
     createdOn: Date;
 }
 
-export interface TagFormat extends Omit<TagStructure, "questions" | "followers"> {
+export interface TagFormat extends Omit<TagStructure, "questions"> {
+    _id: Schema.Types.ObjectId;
     questions: QuestionFormat[];
-    followers: UserFormat[];
 }
 
 const TagSchema = new Schema<TagStructure>({
     name: { type: String, required: true, unique: true },
-    desc: { type: String, required: true },
-    questions: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Reference to questions associated with this tag
-    followers: [{ type: Schema.Types.ObjectId, ref: "users" }], // Reference to Users whose questions are associated with this tag
+    desc: { type: String },
+    questions: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Array of references to questions associated with this tag
+    followers: [{ type: Schema.Types.ObjectId, ref: "users" }], // Array of references to Users whose questions are associated with this tag
     createdOn: { type: Date, default: Date.now },
 });
 

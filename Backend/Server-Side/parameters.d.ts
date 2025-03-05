@@ -3,45 +3,46 @@ import { UserFormat } from "../Database/user.collection";
 
 export interface GetQuestionsParams {
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
     searchQuery?: number;
     filter?: string;
-    sort?: "earliest-first" | "oldest-first";
+    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface CreateQuestionParams {
     title: string;
     content: string;
     tags: string[];
-    author: Schema.Types.ObjectId; //| UserStructure;
+    author_id: string;
     pathToRefetch?: string;
 }
 
 export interface CreateAnswerParams {
     content: string;
-    author: string; // User ID
-    question: string; // Question ID
-    path: string;
+    author_id: string; // User ID
+    question_id: string; // Question ID
+    pathToRefetch: string;
 }
 
 export interface GetAnswersParams {
-    questionId: string;
-    sortBy?: string;
+    question_id: string;
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
+    filter?: string;
+    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface AnswerVoteParams {
-    answerId: string;
-    userId: string;
+    answer_id: string;
+    user_id: string;
     hasUpvoted: boolean;
     hasDownvoted: boolean;
-    path: string;
+    pathToRefetch?: string;
 }
 
 export interface DeleteAnswerParams {
-    answerId: string;
-    path: string;
+    answer_id: string;
+    pathToRefetch?: string;
 }
 
 export interface SearchParams {
@@ -50,15 +51,15 @@ export interface SearchParams {
 }
 
 export interface RecommendedParams {
-    userId: string;
+    user_id: string;
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
     searchQuery?: string;
 }
 
 export interface ViewQuestionParams {
-    questionId: string;
-    userId?: string;
+    question_id: string;
+    user_id?: string;
 }
 
 export interface JobFilterParams {
@@ -67,50 +68,50 @@ export interface JobFilterParams {
 }
 
 export interface GetQuestionByIdParams {
-    questionId: string;
+    question_id: string;
 }
 
 export interface QuestionVoteParams {
-    questionId: string;
-    userId: string;
+    question_id: string;
+    user_id: string;
     hasUpvoted: boolean;
     hasDownvoted: boolean;
-    path: string;
+    pathToRefetch?: string;
 }
 
 export interface DeleteQuestionParams {
-    questionId: string;
-    path: string;
+    question_id: string;
+    pathToRefetch?: string;
 }
 
 export interface EditQuestionParams {
-    questionId: string;
+    question_id: string;
     title: string;
     content: string;
-    path: string;
+    pathToRefetch?: string;
 }
 
 export interface GetAllTagsParams {
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
     filter?: string;
     searchQuery?: string;
 }
 
-export interface GetQuestionsByTagIdParams {
-    tagId: string;
+export interface QuestionsByTagIdParams {
+    tag_id: string;
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
     searchQuery?: string;
 }
 
-export interface GetTopInteractedTagsParams {
-    userId: string;
+export interface TopInteractedTagsParams {
+    user_id: string;
     limit?: number;
 }
 
 export interface CreateUserParams {
-    clerkId: string;
+    clerk_id: string;
     name: string;
     username: string;
     email: string;
@@ -118,42 +119,44 @@ export interface CreateUserParams {
 }
 
 export interface GetUserByIdParams {
-    userId: string;
+    user_id: string;
 }
 
 export interface GetAllUsersParams {
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
     filter?: string;
     searchQuery?: string; // Add searchQuery parameter
+    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface UpdateUserParams {
-    clerkId: string;
+    clerk_id: string;
     updatedData: Partial<UserFormat>;
     pathToRefetch?: string[];
 }
 
-export interface ToggleSaveQuestionParams {
-    userId: string;
-    questionId: string;
-    path: string;
+export interface SaveQuestionParams {
+    hasSaved: boolean;
+    user_id: string;
+    question_id: string;
+    pathToRefetch?: string;
 }
 
 export interface GetSavedQuestionsParams {
-    clerkId: string;
+    clerk_id: string;
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
     filter?: string;
     searchQuery?: string;
 }
 
 export interface GetUserStatsParams {
-    userId: string;
+    user_id: string;
     page?: number;
-    pageSize?: number;
+    pageLimit?: number;
 }
 
 export interface DeleteUserParams {
-    clerkId: string;
+    clerk_id: string;
 }

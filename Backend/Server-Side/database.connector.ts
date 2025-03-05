@@ -24,7 +24,7 @@ export default async function connectToDB(retries: number = 0) {
             retries -= 1;
             // set a timer of 5 seconds before retrying to reconnect
             if (retries >= 1) await new Promise(resolve => setTimeout(resolve, 5000));
-            else console.error("Unable to retry connection", error);
+            else throw new Error("Unable to retry connection");
         }
     } while (retries >= 1);
 }

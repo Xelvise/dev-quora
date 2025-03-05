@@ -14,13 +14,13 @@ interface UserStructure extends Document {
     picture: string;
     location?: string;
     portfolioWebsite?: string;
-    reputation?: number;
-    saved?: Schema.Types.ObjectId[];
-    joinedAt?: Date;
+    reputation: number;
+    saved: Schema.Types.ObjectId[];
+    joinedAt: Date;
 }
 
-export interface UserFormat extends Omit<UserStructure, "saved"> {
-    saved?: QuestionFormat[];
+export interface UserFormat extends UserStructure {
+    _id: Schema.Types.ObjectId;
 }
 
 const UserSchema = new Schema<UserStructure>({
@@ -34,7 +34,7 @@ const UserSchema = new Schema<UserStructure>({
     location: { type: String },
     portfolioWebsite: { type: String },
     reputation: { type: Number, default: 0 },
-    saved: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Reference to questions saved by this user
+    saved: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Array of references to questions saved by this user
     joinedAt: { type: Date, default: Date.now },
 });
 

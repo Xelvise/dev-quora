@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         const { id, email_addresses, image_url, username, first_name, last_name } = event.data;
         // Call a server action to create a new User in DB
         await createUser({
-            clerkId: id,
+            clerk_id: id,
             name: first_name && last_name ? `${first_name} ${last_name}` : first_name || last_name || "User",
             username: username || "User",
             email: email_addresses[0].email_address,
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         const { id, email_addresses, image_url, username, first_name, last_name } = event.data;
         // Call a server action to update existing User in DB
         await updateUser({
-            clerkId: id,
+            clerk_id: id,
             updatedData: {
                 name: first_name && last_name ? `${first_name} ${last_name}` : first_name || last_name || "User",
                 username: username || "User",
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     if (eventType === "user.deleted") {
         const { id } = event.data;
         // Call a server action to delete a User from DB
-        await deleteUser({ clerkId: id! });
+        await deleteUser({ clerk_id: id! });
         return NextResponse.json({ message: "Webhook received: User deleted" }, { status: 200 });
     }
 

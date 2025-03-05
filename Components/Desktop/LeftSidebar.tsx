@@ -11,7 +11,7 @@ export default function LeftSidebar() {
     const pathname = usePathname();
 
     return (
-        <section className="bg-light900_dark400 light-border no-scrollbar shadow-light-250 sticky left-0 top-0 flex h-screen w-fit flex-col justify-between gap-5 overflow-y-auto border-r p-5 pt-32 dark:shadow-none max-sm:hidden lg:w-[275px]">
+        <section className="bg-light900_dark400 light-border no-scrollbar sticky left-0 top-0 flex h-screen w-fit flex-col justify-between gap-10 overflow-y-auto border-r p-5 pt-32 shadow-light-400 dark:shadow-none max-sm:hidden lg:w-[275px]">
             <div className="flex flex-col gap-5">
                 {sidebarLinks.map(({ imgURL, route, label }, index) => {
                     const isSelected = pathname === route;
@@ -32,7 +32,7 @@ export default function LeftSidebar() {
             <SignedOut>
                 <div className="flex flex-col gap-3">
                     <Link href="/sign-in">
-                        <Button className="base-medium btn-secondary min-h-[41px] w-full rounded-[10px] px-4 py-3 shadow-none">
+                        <Button className="base-medium min-h-[41px] w-full rounded-[10px] px-4 py-6 shadow-none lg:hover:border-[2px] lg:hover:border-primary-300">
                             <Image
                                 src="/assets/icons/account.svg"
                                 alt="login"
@@ -44,7 +44,7 @@ export default function LeftSidebar() {
                         </Button>
                     </Link>
                     <Link href="/sign-up">
-                        <Button className="base-medium light-border-2 btn-tertiary text-dark200_light900 min-h-[41px] w-full rounded-[10px] px-4 py-3 shadow-none">
+                        <Button className="base-medium lg:solid-light-border lg:btn-tertiary text-dark200_light900 min-h-[41px] w-full px-4 py-6 shadow-none lg:rounded-[10px]">
                             <Image
                                 src="/assets/icons/sign-up.svg"
                                 alt="sign-up"
