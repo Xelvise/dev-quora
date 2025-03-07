@@ -15,16 +15,15 @@ import Image from "next/image";
 import { tinyPlugins, tinyToolbar } from "@/Constants/tiny-config";
 import { Spinner } from "../Shadcn/spinner";
 import { createQuestion } from "@/Backend/Server-Side/Actions/question.action";
-import { UserFormat } from "@/Backend/Database/user.collection";
 import { QuestionSchema } from "./FormSchemas";
 import { useTheme } from "@/Context-Providers/ThemeProvider";
 
 interface Props {
     formType?: "update" | "create";
-    user_id: string | null;
+    userId: string | null;
 }
 
-export default function AskQuestionForm({ formType = "create", user_id }: Props) {
+export default function AskQuestionForm({ formType = "create", userId }: Props) {
     const { mode } = useTheme();
 
     const form = useForm<z.infer<typeof QuestionSchema>>({
@@ -38,12 +37,12 @@ export default function AskQuestionForm({ formType = "create", user_id }: Props)
         setIsSubmitting(true);
         // Call a server action to create a question
         try {
-            if (!user_id) throw new Error("Something went wrong. Kindly Sign-in");
+            if (!userId) throw new Error("Something went wrong. Kindly Sign-in");
             await createQuestion({
                 title: data.title,
                 content: data.explanation,
                 tags: data.tags,
-                author_id: user_id,
+                author_id: userId,
                 pathToRefetch: "/",
             });
             form.reset();
@@ -108,7 +107,7 @@ export default function AskQuestionForm({ formType = "create", user_id }: Props)
                             </FormLabel>
                             <FormControl>
                                 <Input
-                                    className="no-focus paragraph-regular bg-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] rounded-[7px]"
+                                    className="no-focus paragraph-regular max-sm:body-regular bg-light700_dark300 light-border-2 text-dark300_light700 min-h-[50px] rounded-[7px]"
                                     {...field}
                                 />
                             </FormControl>
@@ -167,7 +166,7 @@ export default function AskQuestionForm({ formType = "create", user_id }: Props)
                             </FormLabel>
                             <FormControl>
                                 <Input
-                                    className="no-focus paragraph-regular bg-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] rounded-[7px]"
+                                    className="no-focus paragraph-regular max-sm:body-regular bg-light700_dark300 light-border-2 text-dark300_light700 min-h-[50px] rounded-[7px]"
                                     placeholder="Add tags..."
                                     onKeyDown={event => handleTagInput(event)}
                                 />
@@ -177,7 +176,7 @@ export default function AskQuestionForm({ formType = "create", user_id }: Props)
                                     {field.value.map(tag => (
                                         <Badge
                                             key={tag}
-                                            className="bg-light800_dark300 text-light400_light500 whitespace-nowrap rounded-lg px-4 py-2"
+                                            className="bg-light800_dark300 text-light400_light500 whitespace-nowrap rounded-[7px] px-4 py-2"
                                         >
                                             {tag}
                                             <Image

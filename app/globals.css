@@ -149,6 +149,9 @@ body {
     .solid-light-border {
         @apply border border-light-700 dark:border-dark-200 !important;
     }
+    .bottom-only-border {
+        @apply border-b-[1px] border-b-light-700 dark:border-b-dark-200;
+    }
     .no-focus {
         @apply focus:ring-transparent;
     }

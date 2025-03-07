@@ -125,28 +125,28 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
     };
     
     return (
-        <div className="flex gap-5">
-            <div className="flex items-center justify-center gap-2.5">
-                <div className="flex items-center justify-center gap-1.5">
+        <div className="flex gap-3">
+            <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center gap-1">
                     <Image
                         src={hasUpvotedOptimistically ? "/assets/icons/upvoted.svg" : "/assets/icons/upvote.svg"}
                         width={18}
                         height={18}
                         alt="upvote"
-                        className={reclickOptions.canUpvote ? "cursor-pointer" : undefined}
+                        className={reclickOptions.canUpvote ? "cursor-pointer" : "cursor-not-allowed"}
                         onClick={reclickOptions.canUpvote ? () => handleVote("upvote") : undefined}
                     />
                     <div className="bg-light700_dark200 flex min-w-[18px] items-center justify-center rounded-sm p-1">
                         <p className="subtle-medium text-dark200_light900">{formatNumber(optimisticUpvotes)}</p>
                     </div>
                 </div>
-                <div className="flex items-center justify-center gap-1.5">
+                <div className="flex items-center justify-center gap-1">
                     <Image
                         src={hasDownvotedOptimistically ? "/assets/icons/downvoted.svg" : "/assets/icons/downvote.svg"}
                         width={18}
                         height={18}
                         alt="downvote"
-                        className={reclickOptions.canDownvote ? "cursor-pointer" : undefined}
+                        className={reclickOptions.canDownvote ? "cursor-pointer" : "cursor-not-allowed"}
                         onClick={reclickOptions.canDownvote ? () => handleVote("downvote") : undefined}
                     />
                     <div className="bg-light700_dark200 flex min-w-[18px] items-center justify-center rounded-sm p-1">
@@ -161,7 +161,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
                     width={18}
                     height={18}
                     alt="star"
-                    className={reclickOptions.canSave ? "cursor-pointer" : undefined}
+                    className={reclickOptions.canSave ? "cursor-pointer" : "cursor-not-allowed"}
                     onClick={reclickOptions.canSave ? () => toggleSave(hasSaved) : undefined}
                 />
             )}

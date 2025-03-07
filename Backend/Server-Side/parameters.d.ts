@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { UserFormat } from "../Database/user.collection";
+import { UserDocument } from "../Database/user.collection";
 
 export interface GetQuestionsParams {
     page?: number;
@@ -59,7 +59,9 @@ export interface RecommendedParams {
 
 export interface ViewQuestionParams {
     question_id: string;
-    user_id?: string;
+    user_id: string | null;
+    clientIP: string | null;
+    pathToRefetch?: string;
 }
 
 export interface JobFilterParams {
@@ -111,7 +113,7 @@ export interface TopInteractedTagsParams {
 }
 
 export interface CreateUserParams {
-    clerk_id: string;
+    clerkId: string;
     name: string;
     username: string;
     email: string;
@@ -132,7 +134,7 @@ export interface GetAllUsersParams {
 
 export interface UpdateUserParams {
     clerk_id: string;
-    updatedData: Partial<UserFormat>;
+    updatedData: Partial<UserDocument>;
     pathToRefetch?: string[];
 }
 
@@ -149,6 +151,7 @@ export interface GetSavedQuestionsParams {
     pageLimit?: number;
     filter?: string;
     searchQuery?: string;
+    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface GetUserStatsParams {

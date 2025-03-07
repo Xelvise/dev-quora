@@ -27,7 +27,7 @@ export default function NoResults({ title, desc, link, imgSrc, linkTitle }: Prop
                 height={200}
                 className="hidden object-contain dark:flex"
             />
-            <h1 className="text-dark200_light900 h2-bold">{title}</h1>
+            <h1 className="text-dark200_light900 h2-bold text-center">{title}</h1>
             {desc && <p className="text-dark100_light700 paragraph-medium max-w-md text-center">{desc}</p>}
             {link && linkTitle && (
                 <Link href={link}>

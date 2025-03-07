@@ -6,8 +6,13 @@ import { HomePageFilters } from "@/Constants/filters";
 import NoResults from "@/Components/Shared/NoResults";
 import QuestionCard from "@/Components/Cards/QuestionCard";
 import { fetchQuestions } from "@/Backend/Server-Side/Actions/question.action";
+import { auth } from "@clerk/nextjs/server";
+import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 
 export default async function Homepage() {
+    const { userId: clerkId } = await auth();
+    const user = await getSignedInUser(clerkId);
+
     try {
         const { questions } = await fetchQuestions({ sortBy: "newest-to-oldest" });
 
@@ -27,17 +32,15 @@ export default async function Homepage() {
                     <SearchBar placeholder="Search questions" assetIcon="search" />
                     <FilterTags filters={HomePageFilters} />
                     <div className="rounded-[7px] border md:hidden">
-                        <FilterSelector
-                            filters={HomePageFilters}
-                            contentClassNames="w-[380px]"
-                            placeholder="Select a Filter"
-                        />
+                        <FilterSelector filters={HomePageFilters} placeholder="Select a Filter" />
                     </div>
                 </div>
 
                 <div className="flex w-full flex-col gap-6">
                     {questions.length > 0 ? (
-                        questions.map(question => <QuestionCard key={question.id} question={question} />)
+                        questions.map(question => (
+                            <QuestionCard key={question.id} question={question} signedInUser={user} />
+                        ))
                     ) : (
                         <NoResults
                             title="There's no question to show"

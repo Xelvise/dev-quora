@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         const { id, email_addresses, image_url, username, first_name, last_name } = event.data;
         // Call a server action to create a new User in DB
         await createUser({
-            clerk_id: id,
+            clerkId: id,
             name: first_name && last_name ? `${first_name} ${last_name}` : first_name || last_name || "User",
             username: username || "User",
             email: email_addresses[0].email_address,

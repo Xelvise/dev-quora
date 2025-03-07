@@ -2,17 +2,40 @@ import Tag from "../Shared/Tag";
 import Link from "next/link";
 import Metric from "../Shared/Metric";
 import { formatNumber, calcTimeDiff } from "@/app/utils";
-import { QuestionFormat } from "@/Backend/Database/question.collection";
+import { QuestionDocument } from "@/Backend/Database/question.collection";
+import VoteSection from "../Shared/VoteSection";
+import { UserStructure } from "@/Backend/Database/user.collection";
 
-export default function QuestionCard({ question }: { question: QuestionFormat }) {
-    const { id, title, tags, author, upvotes, views, answers, createdAt } = question;
+interface Props {
+    question: QuestionDocument;
+    signedInUser: UserStructure | null;
+}
+
+export default function QuestionCard({ question, signedInUser }: Props) {
+    const { _id, id, title, tags, author, upvotes, downvotes, views, anonymous_views, answers, createdAt } = question;
+    const totalViews = views + anonymous_views.length;
+
     return (
-        <div className="card-wrapper dark:card-wrapper-dark flex flex-col items-start justify-center gap-5 rounded-[10px] p-8 sm:px-10">
-            <div className="flex flex-col gap-1">
-                <p className="subtle-regular text-dark200_light700 line-clamp-1 sm:hidden">{`asked ${calcTimeDiff(createdAt)}`}</p>
-                <Link href={`/question/${id}`}>
-                    <p className="sm:h3-semibold base-semibold text-dark400_light900 line-clamp-1">{title}</p>
-                </Link>
+        <div className="card-wrapper dark:card-wrapper-dark flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
+            <div className="flex w-full flex-col-reverse items-start gap-1">
+                <div className="flex flex-col gap-1">
+                    <p className="subtle-regular text-dark200_light700 line-clamp-1 sm:hidden">{`asked ${calcTimeDiff(createdAt)}`}</p>
+                    <Link href={`/question/${id}`}>
+                        <p className="h3-semibold max-sm:base-regular text-dark400_light900 line-clamp-1">{title}</p>
+                    </Link>
+                </div>
+                <div className="flex self-end">
+                    <VoteSection
+                        type="question"
+                        typeId={id}
+                        userId={signedInUser?.id}
+                        upvotes={upvotes.length}
+                        downvotes={downvotes.length}
+                        hasUpvoted={signedInUser ? upvotes.includes(signedInUser._id) : false}
+                        hasDownvoted={signedInUser ? downvotes.includes(signedInUser._id) : false}
+                        hasSaved={signedInUser ? signedInUser.saved.includes(_id) : false}
+                    />
+                </div>
             </div>
 
             {/* If signed in, implement - add, edit & delete actions */}
@@ -26,7 +49,7 @@ export default function QuestionCard({ question }: { question: QuestionFormat })
             <div className="flex w-full flex-wrap items-center justify-between gap-3">
                 <Metric
                     imgPath={author.picture}
-                    imgSize={30}
+                    imgSize={25}
                     metricValue={author.name}
                     metricName={`• asked ${calcTimeDiff(createdAt)}`}
                     href={`/profile/${author.clerkId}`}
@@ -35,20 +58,20 @@ export default function QuestionCard({ question }: { question: QuestionFormat })
                 <div className="flex gap-4">
                     <Metric
                         imgPath="/assets/icons/like.svg"
-                        metricValue={formatNumber(upvotes.length)}
-                        metricName="Likes"
+                        metricValue={formatNumber(upvotes.length + downvotes.length)}
+                        metricName={upvotes.length === 1 ? "Vote" : "Votes"}
                         textStyles="line-clamp-1"
                     />
                     <Metric
                         imgPath="/assets/icons/message.svg"
-                        metricName="Answers"
                         metricValue={formatNumber(answers.length)}
+                        metricName={answers.length === 1 ? "Answer" : "Answers"}
                         textStyles="line-clamp-1"
                     />
                     <Metric
                         imgPath="/assets/icons/eye.svg"
-                        metricName="Views"
-                        metricValue={formatNumber(views)}
+                        metricValue={formatNumber(totalViews)}
+                        metricName={totalViews === 1 ? "View" : "Views"}
                         textStyles="line-clamp-1"
                     />
                 </div>

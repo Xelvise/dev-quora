@@ -19,7 +19,7 @@ interface Props {
 export default function FilterSelector({ filters, placeholder, triggerClassNames="", contentClassNames=""}: Props) {
     return (
         <Select>
-            <SelectTrigger className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular h-[50px] w-full rounded-[7px] border-none px-4 focus:ring-transparent ${triggerClassNames}`}>
+            <SelectTrigger className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular sm:h-[50px] rounded-[7px] border-none px-4 focus:ring-transparent ${triggerClassNames}`}>
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent className={`bg-light800_dark200 text-dark100_light700 rounded-[7px] border-none p-1 ${contentClassNames}`}>

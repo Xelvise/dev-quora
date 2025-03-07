@@ -1,10 +1,10 @@
-import { UserFormat } from "@/Backend/Database/user.collection";
+import { UserDocument } from "@/Backend/Database/user.collection";
 import { fetchTopInteractedTags } from "@/Backend/Server-Side/Actions/tag.action";
 import Image from "next/image";
 import Link from "next/link";
 import Tag from "../Shared/Tag";
 
-export default async function UserCard({ user }: { user: UserFormat }) {
+export default async function UserCard({ user }: { user: UserDocument }) {
     const interactedTags = await fetchTopInteractedTags({ user_id: user.id });
     return (
         <Link

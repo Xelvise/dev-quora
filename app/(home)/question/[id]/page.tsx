@@ -4,14 +4,16 @@ import { calcTimeDiff, formatNumber } from "@/app/utils";
 import { fetchQuestionByID } from "@/Backend/Server-Side/Actions/question.action";
 import Metric from "@/Components/Shared/Metric";
 import ContentParser from "@/Components/Shared/ContentParser";
-import Tag from "@/Components/Shared/Tag";
 import Image from "next/image";
 import Link from "next/link";
 import AnswerForm from "@/Components/Forms/AnswerForm";
 import { auth } from "@clerk/nextjs/server";
-import AllAnswers from "@/Components/Shared/AllAnswers";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import VoteSection from "@/Components/Shared/VoteSection";
+import { QuestionViewCounter } from "@/Components/Shared/ViewCounters";
+import { headers } from "next/headers";
+import AnswerLayout from "@/Components/Shared/AnswerLayout";
+import { fetchAnswers } from "@/Backend/Server-Side/Actions/answer.action";
 
 export default async function QuestionDetails({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -19,11 +21,19 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
     const { userId: clerkId } = await auth();
     const signedInUser = await getSignedInUser(clerkId);
 
+    const headersList = await headers();
+    const IPs = headersList.get("x-forwarded-for");
+    const ip = IPs ? IPs.split(",")[0].trim() : headersList.get("remote-addr");
+
     const question = await fetchQuestionByID(id);
     if (!question) return; // TODO: render a Toaster beneath the page to inform User of resulting error
+    const answers = await fetchAnswers({ question_id: question.id, sortBy: "newest-to-oldest" });
 
+    const totalViews = question.views + question.anonymous_views.length;
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col items-start justify-start">
+            <QuestionViewCounter question_id={id} user_id={signedInUser?.id} clientIP={ip} />
+
             <div className="flex w-full justify-between gap-5 max-sm:flex-col-reverse max-sm:gap-1 sm:items-center">
                 <Link href={`/profile/${question.author.clerkId}`} className="flex justify-start gap-2">
                     <Image
@@ -49,7 +59,9 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
                 </div>
             </div>
 
-            <h2 className="h2-semibold text-dark400_light900 mt-3.5 w-full text-left">{question.title}</h2>
+            <h2 className="h2-semibold max-sm:h3-semibold text-dark400_light900 mt-3.5 w-full text-left">
+                {question.title}
+            </h2>
 
             <div className="mb-2 mt-3 flex flex-wrap gap-4">
                 <Metric
@@ -65,21 +77,15 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
                 />
                 <Metric
                     imgPath="/assets/icons/eye.svg"
-                    metricValue={formatNumber(question.views)}
-                    metricName={question.views === 1 ? "View" : "Views"}
+                    metricValue={formatNumber(totalViews)}
+                    metricName={totalViews === 1 ? "View" : "Views"}
                     textStyles="line-clamp-1"
                 />
             </div>
 
             <ContentParser content={question.content} />
 
-            <div className="mt-3 flex flex-wrap gap-2">
-                {question.tags.map(({ id, name }) => (
-                    <Tag key={id} name={name} id={id} badgeClassNames="uppercase small-regular" />
-                ))}
-            </div>
-
-            <AllAnswers question_id={question.id} signedInUser={signedInUser} />
+            <AnswerLayout question={question} signedInUser={signedInUser} answers={answers} />
 
             <AnswerForm question_id={question.id} signedInUserId={signedInUser?.id} />
         </main>

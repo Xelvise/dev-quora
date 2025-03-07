@@ -1,8 +1,8 @@
-import { TagFormat } from "@/Backend/Database/tag.collection";
+import { TagDocument } from "@/Backend/Database/tag.collection";
 import Link from "next/link";
 import Tag from "../Shared/Tag";
 
-export default function TagCard({ tag }: { tag: TagFormat }) {
+export default function TagCard({ tag }: { tag: TagDocument }) {
     return (
         <Link key={tag.id} href={`/tags/${tag.id}`}>
             <article className="bg-light900_dark400 light-border card-wrapper dark:card-wrapper-dark flex w-fit flex-col items-center rounded-2xl border px-6 py-10 sm:w-[260px]">
