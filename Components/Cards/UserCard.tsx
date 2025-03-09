@@ -19,7 +19,7 @@ export default async function UserCard({ user }: { user: UserDocument }) {
                 </div>
                 <div className="flex items-center gap-2">
                     {interactedTags.map(tag => (
-                        <Tag key={tag.id} id={tag.id} name={tag.name} badgeClassNames="subtle-medium uppercase" />
+                        <Tag key={tag.id} tag_id={tag.id} name={tag.name} badgeClassNames="subtle-medium uppercase" />
                     ))}
                 </div>
             </article>

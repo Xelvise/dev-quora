@@ -9,6 +9,12 @@ export interface GetQuestionsParams {
     sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
+export interface GetQuestionsByIdParams {
+    id: string;
+    retrieveAnswers?: boolean;
+    sortAnswersBy?: "newest-to-oldest" | "oldest-to-newest";
+}
+
 export interface CreateQuestionParams {
     title: string;
     content: string;
@@ -69,10 +75,6 @@ export interface JobFilterParams {
     page: string;
 }
 
-export interface GetQuestionByIdParams {
-    question_id: string;
-}
-
 export interface QuestionVoteParams {
     question_id: string;
     user_id: string;
@@ -105,6 +107,7 @@ export interface QuestionsByTagIdParams {
     page?: number;
     pageLimit?: number;
     searchQuery?: string;
+    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface TopInteractedTagsParams {

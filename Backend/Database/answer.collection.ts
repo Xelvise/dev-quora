@@ -1,11 +1,9 @@
 import { Schema, models, model, Document } from "mongoose";
-import { UserDocument } from "./user.collection";
-import { QuestionDocument } from "./question.collection";
 
 // "AnswerStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection
 
-interface AnswerStructure extends Document {
+export interface AnswerDoc extends Document {
     _id: Schema.Types.ObjectId;
     content: string;
     upvotes: Schema.Types.ObjectId[];
@@ -15,12 +13,7 @@ interface AnswerStructure extends Document {
     createdAt: Date;
 }
 
-export interface AnswerDocument extends Omit<AnswerStructure, "author" | "question"> {
-    author: UserDocument;
-    question: QuestionDocument;
-}
-
-const AnswerSchema = new Schema<AnswerStructure>({
+const AnswerSchema = new Schema<AnswerDoc>({
     content: { type: String, required: true },
     upvotes: [{ type: Schema.Types.ObjectId, ref: "users" }], // Array of references to users that upvoted this question
     downvotes: [{ type: Schema.Types.ObjectId, ref: "users" }], // Array of references to users that downvoted this question

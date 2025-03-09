@@ -30,5 +30,5 @@ import { useEffect } from "react";
 export default function ContentParser({ content }: { content: string }) {
     useEffect(() => Prism.highlightAll(), [content]);
 
-    return <div className="markdown w-full min-w-full">{parse(content)}</div>;
+    return <div className="markdown min-w-full">{parse(content)}</div>;
 }

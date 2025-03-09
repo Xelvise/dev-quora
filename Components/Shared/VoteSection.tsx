@@ -30,7 +30,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
     const [hasSavedOptimistically, setSavedOptimistically] = useState(hasSaved)
 
     const handleVote = async (action: "upvote" | "downvote") => {
-        if (!userId) return console.log("You are not logged in..."); // TODO: render a Toaster that instructs the User to sign in
+        if (!userId) return console.log("Only logged-in Users can cast a vote"); // TODO: render a Toaster that instructs the User to sign in
 
         setReclickState({ ...reclickOptions, canUpvote: false, canDownvote: false });
         if (action === "upvote") {
@@ -106,7 +106,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
     };
     
     const toggleSave = async (hasSaved: boolean) => {
-        if (!userId) return console.log("You are not logged in..."); // TODO: render a Toaster that instructs the User to sign in
+        if (!userId) return console.log("Only logged-in Users can save a question or post"); // TODO: render a Toaster that instructs the User to sign in
         setReclickState({...reclickOptions, canSave: false})
         setSavedOptimistically(!hasSavedOptimistically)
         try {

@@ -1,10 +1,10 @@
 import { Schema, models, model, Document } from "mongoose";
-import { QuestionDocument } from "./question.collection";
+import { QuestionDoc } from "./question.collection";
 
 // "UserStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection
 
-export interface UserStructure extends Document {
+export interface UserDoc extends Document {
     _id: Schema.Types.ObjectId;
     clerkId: string;
     name: string;
@@ -20,11 +20,7 @@ export interface UserStructure extends Document {
     joinedAt: Date;
 }
 
-export interface UserDocument extends Omit<UserStructure, "saved"> {
-    saved: QuestionDocument[];
-}
-
-const UserSchema = new Schema<UserStructure>({
+const UserSchema = new Schema<UserDoc>({
     clerkId: { type: String, required: true },
     name: { type: String, required: true },
     username: { type: String, required: true, unique: true },

@@ -1,11 +1,9 @@
 import { fetchAllTags } from "@/Backend/Server-Side/Actions/tag.action";
 import TagCard from "@/Components/Cards/TagCard";
 import FilterSelector from "@/Components/Shared/FilterSelector";
-import { Badge } from "@/Components/Shadcn/badge";
 import NoResults from "@/Components/Shared/NoResults";
 import SearchBar from "@/Components/Shared/SearchBar";
 import { TagFilters } from "@/Constants/filters";
-import Link from "next/link";
 
 export default async function Tags() {
     const { tags } = await fetchAllTags({});

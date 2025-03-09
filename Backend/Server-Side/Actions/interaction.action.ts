@@ -1,9 +1,9 @@
 "use server";
 
-import QuestionCollection, { QuestionDocument } from "@/Backend/Database/question.collection";
+import QuestionCollection, { QuestionDoc } from "@/Backend/Database/question.collection";
 import connectToDB from "../database.connector";
 import { ViewQuestionParams } from "../parameters";
-import InteractionCollection, { InteractionDocument } from "@/Backend/Database/interaction.collection";
+import InteractionCollection, { InteractionDoc } from "@/Backend/Database/interaction.collection";
 import { revalidatePath } from "next/cache";
 
 export async function viewQuestion(params: ViewQuestionParams) {
@@ -12,7 +12,7 @@ export async function viewQuestion(params: ViewQuestionParams) {
         connectToDB();
         if (user_id) {
             // check for existing interaction
-            const existingInteraction = await InteractionCollection.findOne<InteractionDocument>({
+            const existingInteraction = await InteractionCollection.findOne<InteractionDoc>({
                 user: user_id,
                 action: "view",
                 question: question_id,
@@ -28,7 +28,7 @@ export async function viewQuestion(params: ViewQuestionParams) {
             }
         } else if (clientIP) {
             // If user_id is undefined, then we assume viewer is not signed-in
-            const viewedQuestion = await QuestionCollection.findOne<QuestionDocument>({
+            const viewedQuestion = await QuestionCollection.findOne<QuestionDoc>({
                 _id: question_id,
                 anonymous_views: clientIP,
             });

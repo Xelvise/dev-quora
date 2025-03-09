@@ -13,7 +13,9 @@ import VoteSection from "@/Components/Shared/VoteSection";
 import { QuestionViewCounter } from "@/Components/Shared/ViewCounters";
 import { headers } from "next/headers";
 import AnswerLayout from "@/Components/Shared/AnswerLayout";
-import { fetchAnswers } from "@/Backend/Server-Side/Actions/answer.action";
+import { AnswerDoc } from "@/Backend/Database/answer.collection";
+import { UserDoc } from "@/Backend/Database/user.collection";
+import { TagDoc } from "@/Backend/Database/tag.collection";
 
 export default async function QuestionDetails({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -25,25 +27,27 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
     const IPs = headersList.get("x-forwarded-for");
     const ip = IPs ? IPs.split(",")[0].trim() : headersList.get("remote-addr");
 
-    const question = await fetchQuestionByID(id);
+    const question = await fetchQuestionByID({ id, retrieveAnswers: true, sortAnswersBy: "newest-to-oldest" });
     if (!question) return; // TODO: render a Toaster beneath the page to inform User of resulting error
-    const answers = await fetchAnswers({ question_id: question.id, sortBy: "newest-to-oldest" });
 
-    const totalViews = question.views + question.anonymous_views.length;
+    const questionAuthor = question.author as any as UserDoc;
+    const questionTags = question.tags as any as TagDoc[];
+    const answers = question.answers as any as AnswerDoc[];
+
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col items-start justify-start">
             <QuestionViewCounter question_id={id} user_id={signedInUser?.id} clientIP={ip} />
 
             <div className="flex w-full justify-between gap-5 max-sm:flex-col-reverse max-sm:gap-1 sm:items-center">
-                <Link href={`/profile/${question.author.clerkId}`} className="flex justify-start gap-2">
+                <Link href={`/profile/${questionAuthor.clerkId}`} className="flex justify-start gap-2">
                     <Image
-                        src={question.author.picture}
+                        src={questionAuthor.picture}
                         alt="profile-pic"
                         className="rounded-full object-contain"
                         width={25}
                         height={25}
                     />
-                    <p className="paragraph-semibold text-dark300_light700">{question.author.name}</p>
+                    <p className="paragraph-semibold text-dark300_light700">{questionAuthor.name}</p>
                 </Link>
                 <div className="flex justify-end">
                     <VoteSection
@@ -77,15 +81,15 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
                 />
                 <Metric
                     imgPath="/assets/icons/eye.svg"
-                    metricValue={formatNumber(totalViews)}
-                    metricName={totalViews === 1 ? "View" : "Views"}
+                    metricValue={formatNumber(question.views)}
+                    metricName={question.views === 1 ? "View" : "Views"}
                     textStyles="line-clamp-1"
                 />
             </div>
 
             <ContentParser content={question.content} />
 
-            <AnswerLayout question={question} signedInUser={signedInUser} answers={answers} />
+            <AnswerLayout questionTags={questionTags} answers={answers} signedInUser={signedInUser} clientIP={ip} />
 
             <AnswerForm question_id={question.id} signedInUserId={signedInUser?.id} />
         </main>

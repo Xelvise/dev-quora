@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import UserCollection, { UserDocument, UserStructure } from "../../Database/user.collection";
+import UserCollection, { UserDoc } from "../../Database/user.collection";
 import connectToDB from "../database.connector";
 import { CreateUserParams, DeleteUserParams, GetAllUsersParams, UpdateUserParams } from "../parameters";
 import QuestionCollection from "@/Backend/Database/question.collection";
@@ -9,7 +9,7 @@ import QuestionCollection from "@/Backend/Database/question.collection";
 export async function getSignedInUser(clerk_id: string | null) {
     try {
         await connectToDB();
-        const user = await UserCollection.findOne<UserStructure>({ clerkId: clerk_id });
+        const user = await UserCollection.findOne<UserDoc>({ clerkId: clerk_id });
         return user;
     } catch (error) {
         console.error("User could not be found", error);
@@ -21,7 +21,7 @@ export async function fetchUsers(params: GetAllUsersParams) {
     const { page = 1, pageLimit, filter, searchQuery, sortBy } = params;
     try {
         await connectToDB();
-        const query = UserCollection.find<UserDocument>({});
+        const query = UserCollection.find<UserDoc>({});
         if (pageLimit) query.limit(pageLimit);
         const users = await query.sort({ createdAt: sortBy === "newest-to-oldest" ? -1 : 1 });
         return { users };
@@ -46,7 +46,7 @@ export async function updateUser(params: UpdateUserParams) {
     try {
         await connectToDB();
         // prettier-ignore
-        const updatedUser = await UserCollection.findOneAndUpdate<UserDocument>({ clerkId: clerk_id }, updatedData, { new: true });
+        const updatedUser = await UserCollection.findOneAndUpdate<UserDoc>({ clerkId: clerk_id }, updatedData, { new: true });
         if (pathToRefetch) {
             pathToRefetch.forEach(path => revalidatePath(path));
         }
@@ -61,12 +61,12 @@ export async function deleteUser(params: DeleteUserParams) {
     try {
         await connectToDB();
         // find User in UserCollection
-        const user = await UserCollection.findOne<UserDocument>({ clerkId: clerk_id });
+        const user = await UserCollection.findOne<UserDoc>({ clerkId: clerk_id });
         if (!user) throw new Error("User not found");
 
         // Using objectIds of User's questions, find & delete all User-associated answers, comments, upvotes, etc.
         // prettier-ignore
-        const userQuestionIDs = await QuestionCollection.find<UserDocument>({ author: user._id }).distinct("_id")
+        const userQuestionIDs = await QuestionCollection.find<UserDoc>({ author: user._id }).distinct("_id")
         // TODO ...
 
         // While referencing User's objectId, delete all User-associated questions

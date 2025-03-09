@@ -14,7 +14,6 @@ export default async function SavedCollection() {
 
     try {
         const { savedQuestions } = await fetchSavedQuestions({ clerk_id: clerkId, sortBy: "newest-to-oldest" });
-        console.log("savedQuestions: ", savedQuestions);
 
         return (
             <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">

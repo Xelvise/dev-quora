@@ -1,12 +1,11 @@
 import { Schema, models, model, Document } from "mongoose";
-import { TagDocument } from "./tag.collection";
-import { UserDocument } from "./user.collection";
-import { AnswerDocument } from "./answer.collection";
+import { TagDoc } from "./tag.collection";
+import { UserDoc } from "./user.collection";
 
 // "QuestionStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection
 
-interface QuestionStructure extends Document {
+export interface QuestionDoc extends Document {
     _id: Schema.Types.ObjectId;
     title: string;
     content: string;
@@ -20,13 +19,7 @@ interface QuestionStructure extends Document {
     anonymous_views: string[];
 }
 
-// prettier-ignore
-export interface QuestionDocument extends Omit<QuestionStructure, "tags"| "author"> {
-    tags: TagDocument[];
-    author: UserDocument;
-}
-
-const QuestionSchema = new Schema<QuestionStructure>({
+const QuestionSchema = new Schema<QuestionDoc>({
     title: { type: String, required: true },
     content: { type: String, required: true },
     tags: [{ type: Schema.Types.ObjectId, ref: "tags" }], // Array of references to tags associated with this question

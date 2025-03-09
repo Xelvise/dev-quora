@@ -1,11 +1,10 @@
 import { Schema, model, models, Document } from "mongoose";
-import { QuestionDocument } from "./question.collection";
-import { UserDocument } from "./user.collection";
+import { QuestionDoc } from "./question.collection";
 
 // "TagStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection
 
-interface TagStructure extends Document {
+export interface TagDoc extends Document {
     _id: Schema.Types.ObjectId;
     name: string;
     desc?: string;
@@ -14,11 +13,7 @@ interface TagStructure extends Document {
     createdOn: Date;
 }
 
-export interface TagDocument extends Omit<TagStructure, "questions"> {
-    questions: QuestionDocument[];
-}
-
-const TagSchema = new Schema<TagStructure>({
+const TagSchema = new Schema<TagDoc>({
     name: { type: String, required: true, unique: true },
     desc: { type: String },
     questions: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Array of references to questions associated with this tag

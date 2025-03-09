@@ -48,7 +48,7 @@ export default function RightSidebar() {
                     {popularTags.map(({ _id, name, totalQuestions }) => (
                         <Tag
                             key={_id}
-                            id={_id}
+                            tag_id={_id}
                             name={name}
                             badgeClassNames="subtle-medium uppercase"
                             totalQuestions={totalQuestions}

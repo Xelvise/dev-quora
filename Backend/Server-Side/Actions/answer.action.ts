@@ -1,6 +1,6 @@
 "use server";
 
-import AnswerCollection, { AnswerDocument } from "@/Backend/Database/answer.collection";
+import AnswerCollection, { AnswerDoc } from "@/Backend/Database/answer.collection";
 import connectToDB from "../database.connector";
 import { AnswerVoteParams, CreateAnswerParams, GetAnswersParams } from "../parameters";
 import QuestionCollection from "@/Backend/Database/question.collection";
@@ -11,7 +11,7 @@ export async function createAnswer(params: CreateAnswerParams) {
     const { content, author_id, question_id, pathToRefetch } = params;
     try {
         await connectToDB();
-        const newAnswerDoc: AnswerDocument = await AnswerCollection.create({
+        const newAnswerDoc: AnswerDoc = await AnswerCollection.create({
             content,
             author: author_id,
             question: question_id,
@@ -33,10 +33,10 @@ export async function fetchAnswers(params: GetAnswersParams) {
     const { question_id, page, pageLimit, filter, sortBy } = params;
     try {
         connectToDB();
-        const answers = await AnswerCollection.find<AnswerDocument>({ question: question_id })
+        const answers = await AnswerCollection.find<AnswerDoc>({ question: question_id })
             .populate({ path: "author", model: UserCollection })
             .sort({ createdAt: sortBy === "newest-to-oldest" ? -1 : 1 });
-        return answers;
+        return { answers };
     } catch (error) {
         console.log("Failed to fetch answers", error);
         throw new Error("Failed to fetch answers");
@@ -60,7 +60,7 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
             updateQuery = { $addToSet: { upvotes: user_id } };
         }
-        const question = await AnswerCollection.findByIdAndUpdate<AnswerDocument>(answer_id, updateQuery, {
+        const question = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
             new: true,
         });
         if (!question) throw new Error("Question not found");
@@ -93,7 +93,7 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
             updateQuery = { $addToSet: { downvotes: user_id } };
         }
-        const question = await AnswerCollection.findByIdAndUpdate<AnswerDocument>(answer_id, updateQuery, {
+        const question = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
             new: true,
         });
         if (!question) throw new Error("Question not found");

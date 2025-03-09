@@ -48,6 +48,7 @@ export default function AskQuestionForm({ formType = "create", userId }: Props) 
             form.reset();
             // @ts-ignore
             if (editorRef.current) editorRef.current.setContent("");
+            // TODO: Add a toast notification to inform the user about successful submission
         } catch (error) {
             console.error("Question could not be created");
             if (error instanceof Error) {
@@ -71,17 +72,18 @@ export default function AskQuestionForm({ formType = "create", userId }: Props) 
                         return form.setError("tags", { type: "maxLength", message: "Tag must be less than 15 characters" });
                     }
                     // if tag doesn't already exists or hasn't been added, then append tag to field.value
-                    if (!form.getValues("tags").includes(tagValue)) {
+                    if (!form.getValues("tags").map(tag => tag.toLowerCase()).includes(tagValue.toLowerCase())) {
                         form.setValue("tags", [...form.getValues("tags"), tagValue]);
                         // empty the input field and clear errors after adding the tag
                         tagElement.value = "";
                         form.clearErrors("tags");
                     } else {
                         form.setError("tags", { type: "required", message: "Tag already exists." });
+                        tagElement.value = "";
                     }
                 } else {
                     form.setError("tags", { type: "maxLength", message: "Total added tags must not exceed 3" });
-                    return tagElement.value = ""
+                    tagElement.value = ""
                 }
             } else {
                 form.trigger("tags");
@@ -207,8 +209,8 @@ export default function AskQuestionForm({ formType = "create", userId }: Props) 
                 >
                     {isSubmitting ? (
                         <>
-                            {formType === "create" ? "Creating Question" : "Updating Question"}
                             <Spinner />
+                            {formType === "create" ? "Creating Question" : "Updating Question"}
                         </>
                     ) : formType === "create" ? "Create Question" : "Update Question"}
                 </Button>

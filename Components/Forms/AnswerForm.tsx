@@ -107,7 +107,7 @@ export default function AnswerForm({ signedInUserId, question_id }: Props) {
                         className="primary-gradient flex w-fit gap-2 self-center rounded-[7px] text-light-800"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? <>{"Submitting Answer"} <Spinner /></> : "Submit Answer"}
+                        {isSubmitting ? <><Spinner /> {"Submitting Answer"}</> : "Submit Answer"}
                     </Button>
                 </form>
             </Form>

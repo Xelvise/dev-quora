@@ -2,18 +2,20 @@ import Tag from "../Shared/Tag";
 import Link from "next/link";
 import Metric from "../Shared/Metric";
 import { formatNumber, calcTimeDiff } from "@/app/utils";
-import { QuestionDocument } from "@/Backend/Database/question.collection";
+import { QuestionDoc } from "@/Backend/Database/question.collection";
 import VoteSection from "../Shared/VoteSection";
-import { UserStructure } from "@/Backend/Database/user.collection";
+import { UserDoc } from "@/Backend/Database/user.collection";
+import { TagDoc } from "@/Backend/Database/tag.collection";
 
 interface Props {
-    question: QuestionDocument;
-    signedInUser: UserStructure | null;
+    question: QuestionDoc;
+    signedInUser: UserDoc | null;
 }
 
 export default function QuestionCard({ question, signedInUser }: Props) {
-    const { _id, id, title, tags, author, upvotes, downvotes, views, anonymous_views, answers, createdAt } = question;
-    const totalViews = views + anonymous_views.length;
+    const { _id, id, title, upvotes, downvotes, views, answers, createdAt } = question;
+    const questionAuthor = question.author as any as UserDoc;
+    const questionTags = question.tags as any as TagDoc[];
 
     return (
         <div className="card-wrapper dark:card-wrapper-dark flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
@@ -41,18 +43,18 @@ export default function QuestionCard({ question, signedInUser }: Props) {
             {/* If signed in, implement - add, edit & delete actions */}
 
             <div className="flex flex-wrap gap-2">
-                {tags.map(({ id, name }) => (
-                    <Tag key={id} id={id} name={name} badgeClassNames="uppercase small-regular rounded-[10px]" />
+                {questionTags.map(({ id, name }) => (
+                    <Tag key={id} tag_id={id} name={name} badgeClassNames="uppercase small-regular rounded-[10px]" />
                 ))}
             </div>
 
             <div className="flex w-full flex-wrap items-center justify-between gap-3">
                 <Metric
-                    imgPath={author.picture}
+                    imgPath={questionAuthor.picture}
                     imgSize={25}
-                    metricValue={author.name}
+                    metricValue={questionAuthor.name}
                     metricName={`• asked ${calcTimeDiff(createdAt)}`}
-                    href={`/profile/${author.clerkId}`}
+                    href={`/profile/${questionAuthor.clerkId}`}
                     isAuthor
                 />
                 <div className="flex gap-4">
@@ -70,8 +72,8 @@ export default function QuestionCard({ question, signedInUser }: Props) {
                     />
                     <Metric
                         imgPath="/assets/icons/eye.svg"
-                        metricValue={formatNumber(totalViews)}
-                        metricName={totalViews === 1 ? "View" : "Views"}
+                        metricValue={formatNumber(views)}
+                        metricName={views === 1 ? "View" : "Views"}
                         textStyles="line-clamp-1"
                     />
                 </div>

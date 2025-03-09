@@ -1,16 +1,17 @@
 "use server";
 
-import QuestionCollection, { QuestionDocument } from "@/Backend/Database/question.collection";
+import QuestionCollection, { QuestionDoc } from "@/Backend/Database/question.collection";
 import connectToDB from "../database.connector";
-import TagCollection, { TagDocument } from "@/Backend/Database/tag.collection";
+import TagCollection, { TagDoc } from "@/Backend/Database/tag.collection";
 import {
     CreateQuestionParams,
+    GetQuestionsByIdParams,
     GetQuestionsParams,
     GetSavedQuestionsParams,
     QuestionVoteParams,
     SaveQuestionParams,
 } from "../parameters";
-import UserCollection, { UserDocument } from "@/Backend/Database/user.collection";
+import UserCollection, { UserDoc } from "@/Backend/Database/user.collection";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
 
@@ -18,7 +19,7 @@ export async function fetchQuestions(params: GetQuestionsParams) {
     const { page = 1, pageLimit = 10, searchQuery, filter, sortBy } = params;
     try {
         await connectToDB();
-        const questions = await QuestionCollection.find<QuestionDocument>({})
+        const questions = await QuestionCollection.find<QuestionDoc>({})
             .populate({ path: "tags", model: TagCollection })
             .populate({ path: "author", model: UserCollection })
             .sort({ createdAt: sortBy === "newest-to-oldest" ? -1 : 1 });
@@ -36,8 +37,9 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
     const query = searchQuery ? { title: { $regex: new RegExp(searchQuery, "i") } } : {};
     try {
         await connectToDB();
-        const user = await UserCollection.findOne<UserDocument>({ clerkId: clerk_id }).populate({
+        const user = await UserCollection.findOne<UserDoc>({ clerkId: clerk_id }).populate({
             path: "saved",
+            model: QuestionCollection,
             match: query,
             options: { sort: { createdAt: sortBy === "newest-to-oldest" ? -1 : 1 } },
             populate: [
@@ -46,7 +48,8 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
             ],
         });
         if (!user) throw new Error("User not found");
-        return { savedQuestions: user.saved };
+        const savedQuestions = user.saved as any as QuestionDoc[];
+        return { savedQuestions };
     } catch (error) {
         console.log("Failed to retrieve saved questions", error);
         throw new Error("Failed to retrieve saved questions");
@@ -55,16 +58,26 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
     }
 }
 
-export async function fetchQuestionByID(id: string) {
+export async function fetchQuestionByID(params: GetQuestionsByIdParams) {
+    const { id, retrieveAnswers, sortAnswersBy } = params;
     try {
         await connectToDB();
-        const question = await QuestionCollection.findById<QuestionDocument>(id)
+        const query = QuestionCollection.findById<QuestionDoc>(id)
             .populate({ path: "tags", model: TagCollection })
             .populate({ path: "author", model: UserCollection });
+        if (!retrieveAnswers) {
+            const question = await query;
+            return question;
+        }
+        const question = await query.populate({
+            path: "answers",
+            options: { sort: { createdAt: sortAnswersBy === "newest-to-oldest" ? -1 : 1 } },
+            populate: [{ path: "author", model: UserCollection }],
+        });
         return question;
     } catch (error) {
-        console.log("Failed to retrieve question", error);
-        throw new Error("Failed to retrieve question");
+        console.log("Failed to retrieve question and/or answers", error);
+        throw new Error("Failed to retrieve question and/or answers");
     } finally {
         // await mongoose.connection.close();
     }
@@ -76,23 +89,26 @@ export async function createQuestion(params: CreateQuestionParams) {
         await connectToDB();
 
         // create a new question document and return a reference to the question
-        const newQuestionDoc: QuestionDocument = await QuestionCollection.create({ title, content, author: author_id });
+        const newQuestionDoc: QuestionDoc = await QuestionCollection.create({ title, content, author: author_id });
         const tagsArray: string[] = [];
 
         // create a new tag document or update existing tag document
-        tags.forEach(async tag => {
-            const existingTag = await TagCollection.findOneAndUpdate<TagDocument>(
+        for (const tag of tags) {
+            const existingTag = await TagCollection.findOneAndUpdate<TagDoc>(
                 { name: { $regex: new RegExp(`^${tag}$`, "i") } }, // performs a case-insensitive search for a document whose `name` field matches `tag`
                 { $setOnInsert: { name: tag }, $push: { questions: newQuestionDoc._id } }, // if it exists, we append the new question's objectId to the tag's `questions` field
-                { upsert: true, new: true }, // if there's no existing Tag document that matches `tag`, we insert a new one: where `name` = tag and `questions` is an array containing the question's objectId
+                { upsert: true, new: true }, // if there isn't a match, we upsert a new Tag: where `name` = tag and `questions` is an array containing the question's objectId
             );
             tagsArray.push(existingTag.id);
-        });
+        }
 
         // append array of tags into the newly-created question document
-        await QuestionCollection.findByIdAndUpdate(newQuestionDoc._id, {
-            $push: { tags: { $each: tagsArray } },
-        });
+        const doc = await QuestionCollection.findByIdAndUpdate(
+            newQuestionDoc._id,
+            { $push: { tags: { $each: tagsArray } } },
+            { new: true },
+        );
+        console.log("Question created successfully", doc);
 
         // Increment author's reputation by +5 points for creating a question
         await UserCollection.findByIdAndUpdate(author_id, {
@@ -123,7 +139,7 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
             updateQuery = { $addToSet: { upvotes: user_id } };
         }
-        await QuestionCollection.findByIdAndUpdate<QuestionDocument>(question_id, updateQuery, {
+        await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
             new: true,
         });
 
@@ -155,7 +171,7 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new downvote of UserId to the set of downvotes
             updateQuery = { $addToSet: { downvotes: user_id } };
         }
-        await QuestionCollection.findByIdAndUpdate<QuestionDocument>(question_id, updateQuery, {
+        await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
             new: true,
         });
 
