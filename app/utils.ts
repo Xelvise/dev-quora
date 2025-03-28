@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import qs from "query-string";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -37,4 +38,61 @@ export function formatNumber(num: number) {
     } else {
         return num.toString();
     }
+}
+
+export function parseDate(date: Date) {
+    // Extract the month and year from the Date object
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+
+    // Create the joined date string (e.g, "September 2023")
+    const joinedDate = `${month} ${year}`;
+    return joinedDate;
+}
+
+// prettier-ignore
+export function appendToQueryParams(params: { queryParamStr: string; queryKey: string; queryValue: string }) {
+    const { queryParamStr, queryKey, queryValue } = params;
+    const queryParamObj = qs.parse(queryParamStr);
+    console.log("query-string object after parse: ", queryParamObj)
+    queryParamObj[queryKey] = queryValue;
+
+    return qs.stringifyUrl(
+        {
+            url: window.location.pathname,
+            query: queryParamObj,
+        },
+        { skipNull: true },
+    );
+}
+
+// prettier-ignore
+export function removeFromQueryParams(params: { queryParamStr: string; queryKeys: string[]; }) {
+    const { queryParamStr, queryKeys } = params;
+    const queryParamObj = qs.parse(queryParamStr);
+    console.log("query-string object after parse: ", queryParamObj)
+    queryKeys.forEach(key => delete queryParamObj[key]);
+
+    return qs.stringifyUrl(
+        {
+            url: window.location.pathname,
+            query: queryParamObj,
+        },
+        { skipNull: true },
+    );
+}
+
+export function findFilterNameByValue(filterArray: { name: string; value: string }[], targetValue: string | undefined) {
+    if (!targetValue) return targetValue;
+    for (const filter of filterArray) {
+        if (filter.value === targetValue) {
+            return filter.name;
+        }
+    }
+    return targetValue;
+}
+
+export function areArraysEqual(arr1: string[], arr2: string[]) {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((item, index) => item === arr2[index]);
 }

@@ -1,27 +1,44 @@
-import FilterSelector from "@/Components/Shared/FilterSelector";
-import SearchBar from "@/Components/Shared/SearchBar";
+import Filters from "@/Components/Generic/Filters";
+import { LocalSearchBar } from "@/Components/Generic/SearchBar";
 import { QuestionFilters } from "@/Constants/filters";
-import NoResults from "@/Components/Shared/NoResults";
+import NoResults from "@/Components/Generic/NoResults";
 import QuestionCard from "@/Components/Cards/QuestionCard";
 import { fetchSavedQuestions } from "@/Backend/Server-Side/Actions/question.action";
 import { auth } from "@clerk/nextjs/server";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
+import { redirect } from "next/navigation";
+import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
+import { SavedQuestionFilter } from "@/Backend/Server-Side/parameters";
 
-export default async function SavedCollection() {
+interface Props {
+    searchParams: Promise<{
+        q?: string;
+        filter?: SavedQuestionFilter;
+        page?: string;
+    }>;
+}
+
+export default async function SavedCollection({ searchParams }: Props) {
+    const { q, filter, page } = await searchParams;
     const { userId: clerkId } = await auth();
-    if (!clerkId) return console.log("You need to be logged in to view Saved questions"); // render a Toaster
+    if (!clerkId) return redirect("/"); // render a Toaster saying "You need to be logged in to view Saved questions"
     const user = await getSignedInUser(clerkId);
 
     try {
-        const { savedQuestions } = await fetchSavedQuestions({ clerk_id: clerkId, sortBy: "newest-to-oldest" });
+        const { savedQuestions, hasMorePages } = await fetchSavedQuestions({
+            clerk_id: clerkId,
+            searchQuery: q,
+            filter,
+            page: page ? +page : 1,
+        });
 
         return (
             <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
                 <h1 className="h1-bold text-dark300_light900">Saved Questions</h1>
                 <div className="flex w-full gap-5 max-md:gap-3 max-sm:flex-col">
-                    <SearchBar placeholder="Search amazing minds here..." assetIcon="search" />
-                    <div className="rounded-[7px] border">
-                        <FilterSelector filters={QuestionFilters} placeholder="Select a Filter" />
+                    <LocalSearchBar placeholder="Search your saved collections" assetIcon="search" />
+                    <div className="rounded-[7px]">
+                        <Filters type="menu-list" filterData={QuestionFilters} defaultFilterValue="most_recent" />
                     </div>
                 </div>
 
@@ -33,11 +50,12 @@ export default async function SavedCollection() {
                     ) : (
                         <NoResults
                             title="No Saved Questions Found"
-                            desc="It appears that there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
+                            desc="It appears there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
                             link="/"
                             linkTitle="Explore Questions"
                         />
                     )}
+                    {/* <PopulateQuestionData hasMorePages={hasMorePages} /> */}
                 </div>
             </main>
         );

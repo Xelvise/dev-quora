@@ -1,9 +1,9 @@
-import Tag from "../Shared/Tag";
+import Tag from "../Generic/Tag";
 import Link from "next/link";
-import Metric from "../Shared/Metric";
+import Metric from "../Generic/Metric";
 import { formatNumber, calcTimeDiff } from "@/app/utils";
 import { QuestionDoc } from "@/Backend/Database/question.collection";
-import VoteSection from "../Shared/VoteSection";
+import VoteSection from "../Generic/VoteSection";
 import { UserDoc } from "@/Backend/Database/user.collection";
 import { TagDoc } from "@/Backend/Database/tag.collection";
 
@@ -16,20 +16,21 @@ export default function QuestionCard({ question, signedInUser }: Props) {
     const { _id, id, title, upvotes, downvotes, views, answers, createdAt } = question;
     const questionAuthor = question.author as any as UserDoc;
     const questionTags = question.tags as any as TagDoc[];
+    const totalVotes = upvotes.length + downvotes.length;
 
     return (
         <div className="card-wrapper dark:card-wrapper-dark flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
             <div className="flex w-full flex-col-reverse items-start gap-1">
                 <div className="flex flex-col gap-1">
-                    <p className="subtle-regular text-dark200_light700 line-clamp-1 sm:hidden">{`asked ${calcTimeDiff(createdAt)}`}</p>
+                    <p className="subtle-regular text-dark200_light700 line-clamp-1 md:hidden">{`asked ${calcTimeDiff(new Date(createdAt))}`}</p>
                     <Link href={`/question/${id}`}>
                         <p className="h3-semibold max-sm:base-regular text-dark400_light900 line-clamp-1">{title}</p>
                     </Link>
                 </div>
-                <div className="flex self-end">
+                <div className="flex items-center gap-3 self-end">
                     <VoteSection
-                        type="question"
-                        typeId={id}
+                        postType="question"
+                        post_id={id}
                         userId={signedInUser?.id}
                         upvotes={upvotes.length}
                         downvotes={downvotes.length}
@@ -40,11 +41,14 @@ export default function QuestionCard({ question, signedInUser }: Props) {
                 </div>
             </div>
 
-            {/* If signed in, implement - add, edit & delete actions */}
-
             <div className="flex flex-wrap gap-2">
-                {questionTags.map(({ id, name }) => (
-                    <Tag key={id} tag_id={id} name={name} badgeClassNames="uppercase small-regular rounded-[10px]" />
+                {questionTags.map(({ _id, name }) => (
+                    <Tag
+                        key={String(_id).toString()}
+                        tag_id={String(_id).toString()}
+                        name={name}
+                        badgeClassNames="uppercase small-regular rounded-[10px]"
+                    />
                 ))}
             </div>
 
@@ -53,15 +57,15 @@ export default function QuestionCard({ question, signedInUser }: Props) {
                     imgPath={questionAuthor.picture}
                     imgSize={25}
                     metricValue={questionAuthor.name}
-                    metricName={`• asked ${calcTimeDiff(createdAt)}`}
+                    metricName={`• asked ${calcTimeDiff(new Date(createdAt))}`}
                     href={`/profile/${questionAuthor.clerkId}`}
                     isAuthor
                 />
                 <div className="flex gap-4">
                     <Metric
                         imgPath="/assets/icons/like.svg"
-                        metricValue={formatNumber(upvotes.length + downvotes.length)}
-                        metricName={upvotes.length === 1 ? "Vote" : "Votes"}
+                        metricValue={formatNumber(totalVotes)}
+                        metricName={totalVotes === 1 ? "Vote" : "Votes"}
                         textStyles="line-clamp-1"
                     />
                     <Metric

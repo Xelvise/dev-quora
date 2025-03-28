@@ -8,8 +8,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 interface Props {
-    type: "question" | "answer";
-    typeId: string;
+    postType: "question" | "answer";
+    post_id: string;
     userId: string | null;
     upvotes: number;
     downvotes: number;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 // prettier-ignore
-export default function VoteSection({ type, typeId, userId, upvotes, downvotes, hasUpvoted, hasDownvoted, hasSaved }: Props) {
+export default function VoteSection({ postType, post_id, userId, upvotes, downvotes, hasUpvoted, hasDownvoted, hasSaved }: Props) {
     const pathname = usePathname();
 
     const [reclickOptions, setReclickState] = useState({ canUpvote: true, canDownvote: true, canSave: true });
@@ -41,9 +41,9 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
                 setOptimisticDownvotes(optimisticDownvotes > 0 ? optimisticDownvotes - 1 : optimisticDownvotes);
             }
             try {
-                if (type === "question") {
+                if (postType === "question") {
                     await upvoteQuestion({
-                        question_id: typeId,
+                        question_id: post_id,
                         user_id: userId,
                         hasUpvoted,
                         hasDownvoted,
@@ -51,7 +51,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
                     });
                 } else {
                     await upvoteAnswer({
-                        answer_id: typeId,
+                        answer_id: post_id,
                         user_id: userId,
                         hasUpvoted,
                         hasDownvoted,
@@ -76,9 +76,9 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
                 setOptimisticUpvotes(optimisticUpvotes > 0 ? optimisticUpvotes - 1 : optimisticUpvotes);
             }
             try {
-                if (type === "question") {
+                if (postType === "question") {
                     await downvoteQuestion({
-                        question_id: typeId,
+                        question_id: post_id,
                         user_id: userId,
                         hasUpvoted,
                         hasDownvoted,
@@ -86,7 +86,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
                     });
                 } else {
                     await downvoteAnswer({
-                        answer_id: typeId,
+                        answer_id: post_id,
                         user_id: userId,
                         hasUpvoted,
                         hasDownvoted,
@@ -112,7 +112,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
         try {
             await toggleSaveQuestion({
                 hasSaved: hasSaved,
-                question_id: typeId,
+                question_id: post_id,
                 user_id: userId,
                 pathToRefetch: pathname,
             });
@@ -155,7 +155,7 @@ export default function VoteSection({ type, typeId, userId, upvotes, downvotes, 
                 </div>
             </div>
 
-            {type === "question" && typeof hasSaved !== "undefined" && (
+            {postType === "question" && typeof hasSaved !== "undefined" && (
                 <Image
                     src={hasSavedOptimistically ? "/assets/icons/star-filled.svg" : "/assets/icons/star-red.svg"}
                     width={18}

@@ -1,12 +1,25 @@
 import { Schema } from "mongoose";
-import { UserDocument } from "../Database/user.collection";
+import { UserDoc } from "../Database/user.collection";
+
+export type QuestionFilter = "latest" | "recommended" | "frequent" | "unanswered";
+export type SavedQuestionFilter = "most_recent" | "oldest" | "most_voted" | "most_viewed" | "most_answered";
+export type AnswerFilter = "highestUpvotes" | "lowestUpvotes" | "recent" | "old";
+export type UserFilter = "new_users" | "old_users" | "top_contributors";
+export type TagFilter = "popular" | "recent" | "name" | "old";
 
 export interface GetQuestionsParams {
     page?: number;
-    pageLimit?: number;
-    searchQuery?: number;
-    filter?: string;
-    sortBy?: "newest-to-oldest" | "oldest-to-newest";
+    pageSize?: number;
+    searchQuery?: string;
+    filter?: QuestionFilter;
+}
+
+export interface GetSavedQuestionsParams {
+    clerk_id: string;
+    page?: number;
+    pageSize?: number;
+    filter?: SavedQuestionFilter;
+    searchQuery?: string;
 }
 
 export interface GetQuestionsByIdParams {
@@ -21,6 +34,7 @@ export interface CreateQuestionParams {
     tags: string[];
     author_id: string;
     pathToRefetch?: string;
+    redirectToGivenPath?: boolean;
 }
 
 export interface CreateAnswerParams {
@@ -33,9 +47,8 @@ export interface CreateAnswerParams {
 export interface GetAnswersParams {
     question_id: string;
     page?: number;
-    pageLimit?: number;
-    filter?: string;
-    sortBy?: "newest-to-oldest" | "oldest-to-newest";
+    pageSize?: number;
+    filter?: AnswerFilter;
 }
 
 export interface AnswerVoteParams {
@@ -59,7 +72,7 @@ export interface SearchParams {
 export interface RecommendedParams {
     user_id: string;
     page?: number;
-    pageLimit?: number;
+    pageSize?: number;
     searchQuery?: string;
 }
 
@@ -89,25 +102,26 @@ export interface DeleteQuestionParams {
 }
 
 export interface EditQuestionParams {
-    question_id: string;
-    title: string;
-    content: string;
+    question_id: Schema.Types.ObjectId;
+    updatedTitle: string;
+    updatedContent: string;
+    updatedTags: string[];
     pathToRefetch?: string;
+    redirectToGivenPath?: boolean;
 }
 
 export interface GetAllTagsParams {
     page?: number;
-    pageLimit?: number;
-    filter?: string;
+    pageSize?: number;
+    filter?: TagFilter;
     searchQuery?: string;
 }
 
 export interface QuestionsByTagIdParams {
     tag_id: string;
     page?: number;
-    pageLimit?: number;
+    pageSize?: number;
     searchQuery?: string;
-    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface TopInteractedTagsParams {
@@ -129,16 +143,16 @@ export interface GetUserByIdParams {
 
 export interface GetAllUsersParams {
     page?: number;
-    pageLimit?: number;
-    filter?: string;
+    pageSize?: number;
+    filter?: UserFilter;
     searchQuery?: string; // Add searchQuery parameter
-    sortBy?: "newest-to-oldest" | "oldest-to-newest";
 }
 
 export interface UpdateUserParams {
     clerk_id: string;
-    updatedData: Partial<UserDocument>;
+    updatedData: Partial<UserDoc>;
     pathToRefetch?: string[];
+    redirectToGivenPath?: boolean;
 }
 
 export interface SaveQuestionParams {
@@ -148,19 +162,10 @@ export interface SaveQuestionParams {
     pathToRefetch?: string;
 }
 
-export interface GetSavedQuestionsParams {
-    clerk_id: string;
-    page?: number;
-    pageLimit?: number;
-    filter?: string;
-    searchQuery?: string;
-    sortBy?: "newest-to-oldest" | "oldest-to-newest";
-}
-
 export interface GetUserStatsParams {
     user_id: string;
     page?: number;
-    pageLimit?: number;
+    pageSize?: number;
 }
 
 export interface DeleteUserParams {

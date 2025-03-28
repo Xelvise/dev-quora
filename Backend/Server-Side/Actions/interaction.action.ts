@@ -19,7 +19,7 @@ export async function viewQuestion(params: ViewQuestionParams) {
             });
             if (!existingInteraction) {
                 await InteractionCollection.create({ user: user_id, action: "view", question: question_id });
-                // update view count of currently-viewed question of signed-in user
+                // update view count of currently-viewed question by signed-in user
                 await QuestionCollection.findByIdAndUpdate(question_id, { $inc: { views: 1 } });
                 if (pathToRefetch) {
                     revalidatePath(pathToRefetch);

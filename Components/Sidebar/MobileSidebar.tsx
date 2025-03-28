@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Button } from "../Shadcn/button";
 import { sidebarLinks } from "@/Constants";
 import { usePathname } from "next/navigation";
-import SidebarNavLink from "../Shared/SidebarNavLink";
+import SidebarNavLink from "../Generic/SidebarNavLink";
 import { useState } from "react";
 
 export default function MobileSidebar() {
@@ -27,7 +27,10 @@ export default function MobileSidebar() {
                 />
             </SheetTrigger>
 
-            <SheetContent side="right" className="bg-light900_dark400 flex flex-col justify-between border-none">
+            <SheetContent
+                side="right"
+                className="bg-light900_dark400 flex w-[20rem] flex-col justify-between border-none"
+            >
                 <SheetHeader>
                     <Link href="/" className="flex items-center gap-1">
                         <Image src="/assets/images/site-logo.svg" width={23} height={23} alt="DevQuora" />
@@ -37,7 +40,7 @@ export default function MobileSidebar() {
                     </Link>
                     <section className="flex flex-col gap-6 pt-12">
                         {sidebarLinks.map(({ imgURL, route, label }, index) => {
-                            const isSelected = pathname === route;
+                            const isSelected = pathname === route; // || pathname.split("/").includes(label.toLowerCase());
                             return (
                                 <SidebarNavLink
                                     key={index}

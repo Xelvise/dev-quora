@@ -1,5 +1,4 @@
 import { Schema, models, model, Document } from "mongoose";
-import { QuestionDoc } from "./question.collection";
 
 // "UserStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection

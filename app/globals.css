@@ -81,11 +81,17 @@ body {
     .h1-bold {
         @apply text-[30px] font-bold leading-[42px] tracking-tighter;
     }
+    .h1-regular {
+        @apply text-[30px] font-normal leading-[42px] tracking-tighter;
+    }
     .h2-bold {
         @apply text-[24px] font-bold leading-[31.2px];
     }
     .h2-semibold {
         @apply text-[24px] font-semibold leading-[31.2px];
+    }
+    .h3-regular {
+        @apply text-[20px] font-normal leading-[26px];
     }
     .h3-bold {
         @apply text-[20px] font-bold leading-[26px];
@@ -147,7 +153,7 @@ body {
         @apply border-light-700 dark:border-dark-200 !important;
     }
     .solid-light-border {
-        @apply border border-light-700 dark:border-dark-200 !important;
+        @apply border border-light-800 dark:border-dark-300 !important;
     }
     .bottom-only-border {
         @apply border-b-[1px] border-b-light-700 dark:border-b-dark-200;
@@ -220,7 +226,7 @@ body {
 
     /* CARD & TAB STYLES */
     .tab {
-        @apply text-light-5 min-h-full bg-light-800 dark:bg-dark-400;
+        @apply min-h-full bg-light-800 text-light-500 dark:bg-dark-400;
     }
     .card-wrapper {
         --tw-bg-opacity: 1;

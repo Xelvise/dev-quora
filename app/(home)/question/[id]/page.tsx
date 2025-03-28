@@ -2,24 +2,34 @@
 
 import { calcTimeDiff, formatNumber } from "@/app/utils";
 import { fetchQuestionByID } from "@/Backend/Server-Side/Actions/question.action";
-import Metric from "@/Components/Shared/Metric";
-import ContentParser from "@/Components/Shared/ContentParser";
+import Metric from "@/Components/Generic/Metric";
+import ContentParser from "@/Components/Generic/ContentParser";
 import Image from "next/image";
 import Link from "next/link";
 import AnswerForm from "@/Components/Forms/AnswerForm";
 import { auth } from "@clerk/nextjs/server";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
-import VoteSection from "@/Components/Shared/VoteSection";
-import { QuestionViewCounter } from "@/Components/Shared/ViewCounters";
+import VoteSection from "@/Components/Generic/VoteSection";
+import { QuestionViewCounter } from "@/Components/Generic/ViewCounters";
 import { headers } from "next/headers";
-import AnswerLayout from "@/Components/Shared/AnswerLayout";
-import { AnswerDoc } from "@/Backend/Database/answer.collection";
+import AnswerLayout from "@/Components/Generic/AnswerLayout";
 import { UserDoc } from "@/Backend/Database/user.collection";
-import { TagDoc } from "@/Backend/Database/tag.collection";
+import EditAndDeleteAction from "@/Components/Generic/EditAndDeleteAction";
+import { redirect } from "next/navigation";
+import { fetchAnswers } from "@/Backend/Server-Side/Actions/answer.action";
+import { AnswerFilter } from "@/Backend/Server-Side/parameters";
 
-export default async function QuestionDetails({ params }: { params: Promise<{ id: string }> }) {
+interface Props {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{
+        filter?: AnswerFilter;
+        page?: number;
+    }>;
+}
+
+export default async function QuestionDetails({ params, searchParams }: Props) {
     const { id } = await params;
-
+    const { filter, page } = await searchParams;
     const { userId: clerkId } = await auth();
     const signedInUser = await getSignedInUser(clerkId);
 
@@ -27,13 +37,12 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
     const IPs = headersList.get("x-forwarded-for");
     const ip = IPs ? IPs.split(",")[0].trim() : headersList.get("remote-addr");
 
-    const question = await fetchQuestionByID({ id, retrieveAnswers: true, sortAnswersBy: "newest-to-oldest" });
-    if (!question) return; // TODO: render a Toaster beneath the page to inform User of resulting error
+    const question = await fetchQuestionByID(id);
+    if (!question) return redirect("/"); // TODO: render a Toaster saying "Selected Question does not exist"
+    const { answers, hasMorePages } = await fetchAnswers({ question_id: id, filter, page });
 
     const questionAuthor = question.author as any as UserDoc;
-    const questionTags = question.tags as any as TagDoc[];
-    const answers = question.answers as any as AnswerDoc[];
-
+    const isUserAuthorized = signedInUser && signedInUser.id === questionAuthor.id;
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col items-start justify-start">
             <QuestionViewCounter question_id={id} user_id={signedInUser?.id} clientIP={ip} />
@@ -49,10 +58,10 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
                     />
                     <p className="paragraph-semibold text-dark300_light700">{questionAuthor.name}</p>
                 </Link>
-                <div className="flex justify-end">
+                <div className="flex items-center justify-end gap-3">
                     <VoteSection
-                        type="question"
-                        typeId={question.id}
+                        postType="question"
+                        post_id={question.id}
                         userId={signedInUser?.id}
                         upvotes={question.upvotes.length}
                         downvotes={question.downvotes.length}
@@ -60,6 +69,7 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
                         hasDownvoted={signedInUser ? question.downvotes.includes(signedInUser._id) : false}
                         hasSaved={signedInUser ? signedInUser.saved.includes(question._id) : false}
                     />
+                    {isUserAuthorized && <EditAndDeleteAction postType="question" post_id={id} exitPageAfterDelete />}
                 </div>
             </div>
 
@@ -89,8 +99,14 @@ export default async function QuestionDetails({ params }: { params: Promise<{ id
 
             <ContentParser content={question.content} />
 
-            <AnswerLayout questionTags={questionTags} answers={answers} signedInUser={signedInUser} clientIP={ip} />
-
+            <AnswerLayout
+                fetchedAnswers={JSON.stringify(answers)}
+                currentPage={page}
+                questionTags={JSON.stringify(question.tags)}
+                signedInUser={JSON.stringify(signedInUser)}
+                clientIP={ip}
+                hasMorePages={hasMorePages}
+            />
             <AnswerForm question_id={question.id} signedInUserId={signedInUser?.id} />
         </main>
     );

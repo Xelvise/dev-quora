@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { tinyPlugins, tinyToolbar } from "@/Constants/tiny-config";
 import { Editor } from "@tinymce/tinymce-react";
 import { useRef, useState } from "react";
-import { useTheme } from "@/Context-Providers/ThemeProvider";
+import { useTheme } from "@/app/GlobalContextProvider";
 import { Button } from "../Shadcn/button";
 import { Spinner } from "../Shadcn/spinner";
 import Image from "next/image";
@@ -59,7 +59,7 @@ export default function AnswerForm({ signedInUserId, question_id }: Props) {
     return (
         <>
             <div className="mt-10 flex w-full flex-wrap items-center justify-between gap-5">
-                <p className="base-semibold max-sm:paragraph-semibold text-dark200_light800">Write your answer here</p>
+                <p className="base-semibold max-sm:paragraph-semibold text-dark200_light800">Suggest an answer</p>
                 <Button
                     type="button"
                     className="body-regular dark:solid-light-border flex w-fit gap-2 rounded-[7px] p-3 text-primary-500 dark:text-primary-300"

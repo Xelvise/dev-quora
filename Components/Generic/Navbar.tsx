@@ -2,8 +2,8 @@ import { SignedIn, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeSwitch from "./ThemeSwitch";
-import MobileSidebar from "../Mobile/MobileSidebar";
-import SearchBar from "./SearchBar";
+import MobileSidebar from "../Sidebar/MobileSidebar";
+import { GlobalSearchBar } from "./SearchBar";
 
 export default function Navbar() {
     return (
@@ -27,7 +27,7 @@ export default function Navbar() {
 
             {/* Desktop-only */}
             <div className="w-full max-w-[600px] max-lg:hidden">
-                <SearchBar placeholder="Search globally" assetIcon="search" />
+                <GlobalSearchBar placeholder="Search globally" assetIcon="search" />
             </div>
 
             {/* Mobile and Desktop */}

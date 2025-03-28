@@ -28,7 +28,7 @@ const MetricContent = ({ imgPath, imgSize, metricValue, metricName, isAuthor, te
                 </p>
             )}
             {metricName && (
-                <p className={`${isAuthor ? "max-sm:hidden" : ""} small-regular text-dark200_light800 cursor-text whitespace-nowrap ${textStyles}`}>
+                <p className={`${isAuthor ? "max-md:hidden" : ""} small-regular text-dark200_light800 cursor-text whitespace-nowrap ${textStyles}`}>
                     {metricName}
                 </p>
             )}

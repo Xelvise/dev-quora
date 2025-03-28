@@ -1,10 +1,10 @@
-import { UserDocument } from "@/Backend/Database/user.collection";
+import { UserDoc } from "@/Backend/Database/user.collection";
 import { fetchTopInteractedTags } from "@/Backend/Server-Side/Actions/tag.action";
 import Image from "next/image";
 import Link from "next/link";
-import Tag from "../Shared/Tag";
+import Tag from "../Generic/Tag";
 
-export default async function UserCard({ user }: { user: UserDocument }) {
+export default async function UserCard({ user }: { user: UserDoc }) {
     const interactedTags = await fetchTopInteractedTags({ user_id: user.id });
     return (
         <Link

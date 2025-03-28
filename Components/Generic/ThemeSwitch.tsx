@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "@/Context-Providers/ThemeProvider";
+import { useTheme } from "@/app/GlobalContextProvider";
 import Image from "next/image";
 
 export default function ThemeSwitch() {

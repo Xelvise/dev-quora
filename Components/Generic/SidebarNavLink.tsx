@@ -1,6 +1,7 @@
-import { SignedIn } from "@clerk/nextjs";
+import { SignedIn, useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
+import { Dispatch, SetStateAction } from "react";
 
 interface Props {
     route: string;
@@ -9,7 +10,7 @@ interface Props {
     isSelected: boolean;
     imgSize: number;
     isDesktopView?: boolean;
-    sidebarUpdateFn?: (state: boolean) => void;
+    sidebarUpdateFn?: Dispatch<SetStateAction<boolean>>;
 }
 
 // prettier-ignore
@@ -38,11 +39,13 @@ const LinkContent = ({ route, imgURL, label, isSelected, imgSize, isDesktopView,
 
 // prettier-ignore
 export default function SidebarNavLink({ route, imgURL, label, isSelected, imgSize, isDesktopView, sidebarUpdateFn }: Props) {
+    const { userId: clerkId } = useAuth();
+
     if (label === "Profile") {
         return (
             <SignedIn>
                 <LinkContent
-                    route={route}
+                    route={`${route}/${clerkId}`}
                     imgURL={imgURL}
                     label={label}
                     isSelected={isSelected}

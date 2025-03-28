@@ -2,7 +2,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,43 +14,64 @@ import { Badge } from "../Shadcn/badge";
 import Image from "next/image";
 import { tinyPlugins, tinyToolbar } from "@/Constants/tiny-config";
 import { Spinner } from "../Shadcn/spinner";
-import { createQuestion } from "@/Backend/Server-Side/Actions/question.action";
-import { QuestionSchema } from "./FormSchemas";
-import { useTheme } from "@/Context-Providers/ThemeProvider";
+import { createQuestion, updateQuestion } from "@/Backend/Server-Side/Actions/question.action";
+import { AskQuestionSchema } from "./FormSchemas";
+import { useTheme } from "@/app/GlobalContextProvider";
+import { QuestionDoc } from "@/Backend/Database/question.collection";
+import { useRouter } from "next/navigation";
 
 interface Props {
     formType?: "update" | "create";
-    userId: string | null;
+    user_id: string | null;
+    previousQuestion?: any;
 }
 
-export default function AskQuestionForm({ formType = "create", userId }: Props) {
-    const { mode } = useTheme();
+export default function AskQuestionForm({ formType = "create", user_id, previousQuestion }: Props) {
+    const { mode } = useTheme(); // used to decide the theme of the editor
+    const router = useRouter();
 
-    const form = useForm<z.infer<typeof QuestionSchema>>({
-        resolver: zodResolver(QuestionSchema),
-        defaultValues: { tags: [], title: "", explanation: "" },
+    const prevQuestion: QuestionDoc = previousQuestion ? JSON.parse(previousQuestion) : {};
+    const tags = prevQuestion?.tags?.map((tag: any) => tag.name as string) || [];
+
+    const form = useForm<z.infer<typeof AskQuestionSchema>>({
+        resolver: zodResolver(AskQuestionSchema),
+        defaultValues: {
+            tags,
+            title: prevQuestion?.title || "",
+            explanation: prevQuestion?.content || "",
+        },
     });
     const editorRef = useRef<Editor | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const onSubmitForm = async (data: z.infer<typeof QuestionSchema>) => {
+    const onSubmitForm = async (data: z.infer<typeof AskQuestionSchema>) => {
         setIsSubmitting(true);
         // Call a server action to create a question
         try {
-            if (!userId) throw new Error("Something went wrong. Kindly Sign-in");
-            await createQuestion({
-                title: data.title,
-                content: data.explanation,
-                tags: data.tags,
-                author_id: userId,
-                pathToRefetch: "/",
-            });
-            form.reset();
-            // @ts-ignore
-            if (editorRef.current) editorRef.current.setContent("");
+            if (!user_id) throw new Error("Something went wrong. Kindly Sign-in");
+            if (Object.keys(prevQuestion).length > 0) {
+                await updateQuestion({
+                    question_id: prevQuestion._id,
+                    updatedTitle: data.title,
+                    updatedContent: data.explanation,
+                    updatedTags: data.tags,
+                    pathToRefetch: "/",
+                });
+                router.back();
+            } else {
+                await createQuestion({
+                    title: data.title,
+                    content: data.explanation,
+                    tags: data.tags,
+                    author_id: user_id,
+                    pathToRefetch: "/",
+                });
+                router.push("/");
+            }
             // TODO: Add a toast notification to inform the user about successful submission
+            localStorage.removeItem("referrer");
         } catch (error) {
-            console.error("Question could not be created");
+            console.error("Question could not be created: ", error);
             if (error instanceof Error) {
                 // TODO: Add a toast notification to inform the user about the error
             }
@@ -134,7 +155,7 @@ export default function AskQuestionForm({ formType = "create", userId }: Props) 
                                     apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
                                     // @ts-ignore
                                     onInit={(_, editor) => (editorRef.current = editor)}
-                                    initialValue=""
+                                    initialValue={prevQuestion?.content || ""}
                                     onBlur={field.onBlur}
                                     onEditorChange={content => field.onChange(content)}
                                     init={{
