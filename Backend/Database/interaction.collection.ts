@@ -6,12 +6,11 @@ import { Schema, model, models, Document } from "mongoose";
 export interface InteractionDoc extends Document {
     _id: Schema.Types.ObjectId;
     user: Schema.Types.ObjectId;
-    IP_address: string;
     action: string;
-    question: Schema.Types.ObjectId;
-    answer: Schema.Types.ObjectId;
-    tags: Schema.Types.ObjectId[];
-    createdOn: Date;
+    question?: Schema.Types.ObjectId;
+    answer?: Schema.Types.ObjectId;
+    tags?: Schema.Types.ObjectId[];
+    createdOn?: Date;
 }
 
 // export interface InteractionFormat extends InteractionStructure {}

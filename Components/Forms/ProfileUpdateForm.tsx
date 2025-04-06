@@ -17,11 +17,11 @@ import { updateUser } from "@/Backend/Server-Side/Actions/user.action";
 
 interface Props {
     clerkId: string;
-    profileDetails: any;
+    stringifiedProfileDetails: any;
 }
 
-export default function ProfileUpdateForm({ clerkId, profileDetails }: Props) {
-    const profile = JSON.parse(profileDetails) as UserDoc;
+export default function ProfileUpdateForm({ clerkId, stringifiedProfileDetails }: Props) {
+    const profile = JSON.parse(stringifiedProfileDetails) as UserDoc;
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
 

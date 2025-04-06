@@ -75,35 +75,35 @@ export async function fetchTopInteractedTags(params: TopInteractedTagsParams): P
 export async function fetchQuestionsByTagID(params: QuestionsByTagIdParams) {
     const { tag_id, page = 1, pageSize = 5, searchQuery } = params;
     const filterQuery = searchQuery ? { title: { $regex: new RegExp(searchQuery, "i") } } : {};
-    // const past_pages = (page - 1) * pageSize;
-    let isFetching = true;
+    const past_pages = (page - 1) * pageSize;
+
     try {
         await connectToDB();
-        const tag_ = TagCollection.findById<TagDoc>(tag_id);
-        let tagDoc = await tag_;
+
+        // Fetch the tag document
+        const tagDoc = await TagCollection.findById<TagDoc>(tag_id);
         if (!tagDoc) throw new Error("Tag not found");
+
         const totalQuestions = tagDoc.questions.length;
 
-        tagDoc = await tag_
-            // .skip(past_pages)
-            .limit(page * pageSize)
-            .populate({
-                path: "questions",
-                model: QuestionCollection,
-                match: filterQuery,
-                populate: [
-                    { path: "tags", model: TagCollection },
-                    { path: "author", model: UserCollection },
-                ],
-                options: { sort: { createdAt: -1 } },
-            });
+        // Create a new query to fetch paginated and populated questions
+        const populatedTagDoc = await TagCollection.findById<TagDoc>(tag_id).populate({
+            path: "questions",
+            model: QuestionCollection,
+            match: filterQuery,
+            options: { skip: past_pages, limit: pageSize, sort: { createdAt: -1 } },
+            populate: [
+                { path: "tags", model: TagCollection },
+                { path: "author", model: UserCollection },
+            ],
+        });
 
-        const questions = tagDoc!.questions as any as QuestionDoc[];
-        const hasMorePages = totalQuestions > page * pageSize; // > past_pages + questions.length;
-        isFetching = false;
-        return { tagTitle: tagDoc!.name, questions, hasMorePages, isFetching };
+        const questions = populatedTagDoc!.questions as any as QuestionDoc[];
+        const hasMorePages = totalQuestions > past_pages + questions.length;
+
+        return { tagTitle: populatedTagDoc!.name, questions, hasMorePages };
     } catch (error) {
-        console.error("Error occured while fetching Questions", error);
-        throw new Error("Error occured while fetching Questions");
+        console.error("Error occurred while fetching Questions", error);
+        throw new Error("Error occurred while fetching Questions");
     }
 }

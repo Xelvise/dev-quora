@@ -1,15 +1,18 @@
 import { formatNumber } from "@/app/utils";
+import { BadgeCounts } from "@/types";
 import Image from "next/image";
 
 interface Props {
     totalAnswers: number;
     totalQuestions: number;
+    badgeCounts: BadgeCounts;
+    reputation: number;
 }
 
-export default function UserStats({ totalAnswers, totalQuestions }: Props) {
+export default function UserStats({ totalAnswers, totalQuestions, badgeCounts, reputation }: Props) {
     return (
-        <div className="sm:mt-16">
-            <p className="h3-semibold text-dark400_light900 mb-3">Statistics</p>
+        <div className="mt-14">
+            <p className="h3-semibold text-dark400_light900 mb-3">Rank: {reputation}</p>
             <div className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-4">
                 <div className="light-border bg-light900_dark300 flex flex-wrap items-center gap-4 rounded-md border p-6 shadow-light-300 dark:shadow-dark-200">
                     <div>
@@ -22,9 +25,9 @@ export default function UserStats({ totalAnswers, totalQuestions }: Props) {
                     </div>
                 </div>
 
-                <StatsCard imgURL="/assets/icons/gold-medal.svg" value={0} title="Gold Badges" />
-                <StatsCard imgURL="/assets/icons/silver-medal.svg" value={0} title="Silver Badges" />
-                <StatsCard imgURL="/assets/icons/bronze-medal.svg" value={0} title="Bronze Badges" />
+                <StatsCard imgURL="/assets/icons/gold-medal.svg" value={badgeCounts.GOLD} title="Gold Badges" />
+                <StatsCard imgURL="/assets/icons/silver-medal.svg" value={badgeCounts.SILVER} title="Silver Badges" />
+                <StatsCard imgURL="/assets/icons/bronze-medal.svg" value={badgeCounts.BRONZE} title="Bronze Badges" />
             </div>
         </div>
     );

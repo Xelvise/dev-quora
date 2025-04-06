@@ -39,7 +39,7 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
 
     const question = await fetchQuestionByID(id);
     if (!question) return redirect("/"); // TODO: render a Toaster saying "Selected Question does not exist"
-    const { answers, hasMorePages } = await fetchAnswers({ question_id: id, filter, page });
+    const data = await fetchAnswers({ question_id: id, filter, page });
 
     const questionAuthor = question.author as any as UserDoc;
     const isUserAuthorized = signedInUser && signedInUser.id === questionAuthor.id;
@@ -100,14 +100,13 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
             <ContentParser content={question.content} />
 
             <AnswerLayout
-                fetchedAnswers={JSON.stringify(answers)}
+                stringifiedFetchedData={JSON.stringify(data)}
                 currentPage={page}
-                questionTags={JSON.stringify(question.tags)}
-                signedInUser={JSON.stringify(signedInUser)}
+                stringifiedQuestionTags={JSON.stringify(question.tags)}
+                stringifiedSignedInUser={JSON.stringify(signedInUser)}
                 clientIP={ip}
-                hasMorePages={hasMorePages}
             />
-            <AnswerForm question_id={question.id} signedInUserId={signedInUser?.id} />
+            <AnswerForm stringifiedQuestion={JSON.stringify(question)} signedInUserId={signedInUser?.id} />
         </main>
     );
 }

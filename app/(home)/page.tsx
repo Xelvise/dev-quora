@@ -1,13 +1,12 @@
 import Filters from "@/Components/Generic/Filters";
-import { LocalSearchBar } from "@/Components/Generic/SearchBar";
+import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import Link from "next/link";
 import { HomePageFilters } from "@/Constants/filters";
-import NoResults from "@/Components/Generic/NoResults";
 import { fetchQuestions } from "@/Backend/Server-Side/Actions/question.action";
 import { auth } from "@clerk/nextjs/server";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import { QuestionFilter } from "@/Backend/Server-Side/parameters";
-import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
+import PopulateQuestionCard from "@/Components/Populators/PopulateQuestionCard";
 
 interface Props {
     searchParams: Promise<{
@@ -18,12 +17,13 @@ interface Props {
 }
 
 export default async function Homepage({ searchParams }: Props) {
-    const { q, filter } = await searchParams;
+    const { q, filter, page } = await searchParams;
+    const pageNo = page ? +page : 1;
     const { userId: clerkId } = await auth();
     const user = await getSignedInUser(clerkId);
 
     try {
-        const data = await fetchQuestions({ searchQuery: q, filter });
+        const data = await fetchQuestions({ searchQuery: q, filter, page: pageNo });
 
         return (
             <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
@@ -45,19 +45,18 @@ export default async function Homepage({ searchParams }: Props) {
                     </div>
                 </div>
 
-                <PopulateQuestionData initial_data={JSON.stringify(data)} signedInUser={JSON.stringify(user)}>
-                    <NoResults
-                        title="There's no question to show"
-                        desc="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. Our query could be the next big thing others learn from. Get Involved! 💡"
-                        link="/ask-question"
-                        linkTitle="Ask a Question"
-                    />
-                </PopulateQuestionData>
+                <PopulateQuestionCard
+                    serverAction="fetchQuestions"
+                    initial_data={JSON.stringify(data)}
+                    signedInUser={JSON.stringify(user)}
+                    fetchOnServerSide
+                />
             </main>
         );
     } catch (error) {
         if (error instanceof Error && error.message === "Failed to retrieve questions") {
             // TODO: Add a toast notification to inform the user about the error
         }
+        console.log("Experienced an error: ", error);
     }
 }

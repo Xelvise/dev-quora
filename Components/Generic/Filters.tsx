@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client";
 
-import { appendToQueryParams, findFilterNameByValue } from "@/app/utils";
+import { findFilterNameByValue } from "@/app/utils";
 // prettier-ignore
 import { Select, SelectLabel, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/Components/Shadcn/select";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -31,19 +31,17 @@ export default function Filters({ type, filterData, defaultFilterValue, placehol
 
     const handleFilterSelection = async (value: string) => {
         pathname === "/" ? sendFilterToContext(value) : setSelectedFilter(value);
-        const newURL = appendToQueryParams({
-            queryParamStr: queryParams.toString(), // takes the form of "filter=frequent&q=react"
-            queryKey: "filter",
-            queryValue: value
-        });
-        router.push(newURL, { scroll: false });
+        const newURL = new URL(window.location.href);
+        newURL.searchParams.set("filter", value);
+        newURL.searchParams.delete("page");
+        router.push(newURL.toString(), { scroll: false });
     }
 
     if (type === "menu-list") {
         return (
             <Select onValueChange={value => handleFilterSelection(value)}>
                 <SelectTrigger
-                    className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular rounded-[7px] border-none px-4 focus:ring-transparent sm:h-[50px] sm:min-w-[170px] ${menuTriggerClassName}`}
+                    className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular rounded-[7px] border-none px-4 focus:ring-transparent h-[50px] min-w-[170px] ${menuTriggerClassName}`}
                 >
                     <SelectValue
                         placeholder={

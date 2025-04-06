@@ -1,5 +1,5 @@
 import Filters from "@/Components/Generic/Filters";
-import { LocalSearchBar } from "@/Components/Generic/SearchBar";
+import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import { QuestionFilters } from "@/Constants/filters";
 import NoResults from "@/Components/Generic/NoResults";
 import QuestionCard from "@/Components/Cards/QuestionCard";
@@ -7,7 +7,6 @@ import { fetchSavedQuestions } from "@/Backend/Server-Side/Actions/question.acti
 import { auth } from "@clerk/nextjs/server";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import { redirect } from "next/navigation";
-import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
 import { SavedQuestionFilter } from "@/Backend/Server-Side/parameters";
 
 interface Props {
@@ -25,7 +24,7 @@ export default async function SavedCollection({ searchParams }: Props) {
     const user = await getSignedInUser(clerkId);
 
     try {
-        const { savedQuestions, hasMorePages } = await fetchSavedQuestions({
+        const { questions: savedQuestions, hasMorePages } = await fetchSavedQuestions({
             clerk_id: clerkId,
             searchQuery: q,
             filter,
@@ -55,7 +54,6 @@ export default async function SavedCollection({ searchParams }: Props) {
                             linkTitle="Explore Questions"
                         />
                     )}
-                    {/* <PopulateQuestionData hasMorePages={hasMorePages} /> */}
                 </div>
             </main>
         );

@@ -9,24 +9,25 @@ import ProfileLink from "@/Components/Generic/ProfileLink";
 import UserStats from "@/Components/Generic/UserStats";
 import { fetchUserTopQuestions } from "@/Backend/Server-Side/Actions/question.action";
 import { fetchUserTopAnswers } from "@/Backend/Server-Side/Actions/answer.action";
-import { redirect, useRouter } from "next/navigation";
-import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
-import QuesAnsTab from "@/Components/Generic/QuesAnsTab";
+import { redirect } from "next/navigation";
+import QuestionAnswerTab from "@/Components/Generic/QuestionAnswerTab";
 
 interface Props {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ page?: string }>;
 }
 
-export default async function Profile({ params }: Props) {
+export default async function Profile({ params, searchParams }: Props) {
     const { id } = await params;
+    const { page } = await searchParams;
 
     const { userId: signedInUserId } = await auth();
     const signedInUser = await getSignedInUser(signedInUserId);
 
-    const { user, totalQuestions, totalAnswers } = await fetchUserProfileInfo(id);
+    const { user, totalQuestions, totalAnswers, badgeCounts } = await fetchUserProfileInfo(id);
     if (!user) redirect("/community"); // TODO: render a Toaster saying "User profile does not exist"
-    const { questions } = await fetchUserTopQuestions({ user_id: user.id });
-    const { answers } = await fetchUserTopAnswers({ user_id: user.id });
+    const questionData = await fetchUserTopQuestions({ user_id: user.id, page: page ? +page : 1 });
+    const answerData = await fetchUserTopAnswers({ user_id: user.id, page: page ? +page : 1 });
 
     return (
         <main className="flex max-w-5xl flex-1 flex-col">
@@ -71,8 +72,17 @@ export default async function Profile({ params }: Props) {
                     </SignedIn>
                 </div>
             </div>
-            <UserStats totalQuestions={totalQuestions} totalAnswers={totalAnswers} />
-            {/* <QuesAnsTab /> */}
+            <UserStats
+                totalQuestions={totalQuestions}
+                totalAnswers={totalAnswers}
+                badgeCounts={badgeCounts}
+                reputation={user.reputation}
+            />
+            <QuestionAnswerTab
+                stringifiedQuestionData={JSON.stringify(questionData)}
+                stringifiedAnswerData={JSON.stringify(answerData)}
+                stringifiedSignedInUser={JSON.stringify(signedInUser)}
+            />
         </main>
     );
 }

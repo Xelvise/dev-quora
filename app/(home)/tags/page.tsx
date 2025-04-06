@@ -2,9 +2,9 @@ import { fetchAllTags } from "@/Backend/Server-Side/Actions/tag.action";
 import { TagFilter } from "@/Backend/Server-Side/parameters";
 import TagCard from "@/Components/Cards/TagCard";
 import Filters from "@/Components/Generic/Filters";
-import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
+
 import NoResults from "@/Components/Generic/NoResults";
-import { LocalSearchBar } from "@/Components/Generic/SearchBar";
+import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import { TagFilters } from "@/Constants/filters";
 
 interface Props {

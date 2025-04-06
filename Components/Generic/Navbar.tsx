@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import ThemeSwitch from "./ThemeSwitch";
 import MobileSidebar from "../Sidebar/MobileSidebar";
-import { GlobalSearchBar } from "./SearchBar";
+import { GlobalSearchBar } from "./GlobalSearchBar";
 
 export default function Navbar() {
     return (
-        <nav className="flex-between bg-light900_dark400 shadow-effect fixed z-50 flex w-full gap-5 px-8 py-4 dark:shadow-none max-sm:px-5 max-sm:py-3">
+        <nav className="bg-light900_dark400 shadow-effect fixed z-50 flex w-full items-center justify-between gap-5 px-8 py-4 dark:shadow-none max-sm:px-5 max-sm:py-3">
             {/* Desktop-only */}
             <Link href="/" className="flex items-center gap-1 max-sm:hidden">
                 <Image src="/assets/images/site-logo.svg" width={23} height={23} alt="DevQuora" />
@@ -26,9 +26,7 @@ export default function Navbar() {
             </div>
 
             {/* Desktop-only */}
-            <div className="w-full max-w-[600px] max-lg:hidden">
-                <GlobalSearchBar placeholder="Search globally" assetIcon="search" />
-            </div>
+            <GlobalSearchBar placeholder="Search globally" assetIcon="search" />
 
             {/* Mobile and Desktop */}
             <div className="flex-between gap-10">

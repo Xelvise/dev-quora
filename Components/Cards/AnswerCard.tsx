@@ -43,8 +43,8 @@ export default function AnswerCard({ answer, signedInUser }: Props) {
                     {/* prettier-ignore */}
                     <VoteSection
                           postType="question"
-                          post_id={answer.id}
-                          userId={signedInUser?.id}
+                          post_id={String(answer._id)}
+                          userId={signedInUser ? String(signedInUser._id) : null}
                           upvotes={answer.upvotes.length}
                           downvotes={answer.downvotes.length}
                           hasUpvoted={signedInUser ? answer.upvotes.includes(signedInUser._id) : false}

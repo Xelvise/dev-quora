@@ -23,15 +23,15 @@ export default function QuestionCard({ question, signedInUser }: Props) {
             <div className="flex w-full flex-col-reverse items-start gap-1">
                 <div className="flex flex-col gap-1">
                     <p className="subtle-regular text-dark200_light700 line-clamp-1 md:hidden">{`asked ${calcTimeDiff(new Date(createdAt))}`}</p>
-                    <Link href={`/question/${id}`}>
+                    <Link href={`/question/${String(_id)}`}>
                         <p className="h3-semibold max-sm:base-regular text-dark400_light900 line-clamp-1">{title}</p>
                     </Link>
                 </div>
                 <div className="flex items-center gap-3 self-end">
                     <VoteSection
                         postType="question"
-                        post_id={id}
-                        userId={signedInUser?.id}
+                        post_id={String(_id)}
+                        userId={signedInUser ? String(signedInUser._id) : null}
                         upvotes={upvotes.length}
                         downvotes={downvotes.length}
                         hasUpvoted={signedInUser ? upvotes.includes(signedInUser._id) : false}

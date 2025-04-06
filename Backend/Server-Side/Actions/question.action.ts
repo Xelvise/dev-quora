@@ -15,23 +15,22 @@ import {
 } from "../parameters";
 import UserCollection, { UserDoc } from "@/Backend/Database/user.collection";
 import { revalidatePath } from "next/cache";
-import mongoose, { FilterQuery } from "mongoose";
-import AnswerCollection from "@/Backend/Database/answer.collection";
+import mongoose, { FilterQuery, Schema } from "mongoose";
+import AnswerCollection, { AnswerDoc } from "@/Backend/Database/answer.collection";
 import InteractionCollection from "@/Backend/Database/interaction.collection";
 
 export async function fetchQuestions(params: GetQuestionsParams) {
     const { page = 1, pageSize = 5, searchQuery, filter = "latest" } = params;
     const filterQuery: FilterQuery<typeof QuestionCollection> = {};
-    // if (searchQuery) {
-    //     filterQuery.$or = [
-    //         { title: { $regex: new RegExp(searchQuery, "i") } },
-    //         { content: { $regex: new RegExp(searchQuery, "i") } },
-    //     ];
-    // }
+    if (searchQuery) {
+        filterQuery.$or = [
+            { title: { $regex: new RegExp(searchQuery, "i") } },
+            { content: { $regex: new RegExp(searchQuery, "i") } },
+        ];
+    }
     if (filter === "unanswered") filterQuery.answers = { $size: 0 };
 
     const pastQuestions = (page - 1) * pageSize;
-    console.log("fetching questions");
     try {
         await connectToDB();
         const questions_ = QuestionCollection.find<QuestionDoc>(filterQuery)
@@ -75,7 +74,7 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
             { content: { $regex: new RegExp(searchQuery, "i") } },
         ];
     }
-    // const pastQuestions = (page - 1) * pageSize;
+    const pastQuestions = (page - 1) * pageSize;
     // prettier-ignore
     const sortOptions = filter === "most_recent"
                             ? { createdAt: -1 }
@@ -99,20 +98,23 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
         if (!userDoc) throw new Error("User not found");
         const totalQuestions = userDoc.saved.length;
 
-        userDoc = await user_.limit(page * pageSize).populate({
-            path: "saved",
-            model: QuestionCollection,
-            match: filterQuery,
-            populate: [
-                { path: "tags", model: TagCollection },
-                { path: "author", model: UserCollection },
-            ],
-            options: { sort: sortOptions },
-        });
+        userDoc = await user_
+            .skip(pastQuestions)
+            .limit(pageSize)
+            .populate({
+                path: "saved",
+                model: QuestionCollection,
+                match: filterQuery,
+                populate: [
+                    { path: "tags", model: TagCollection },
+                    { path: "author", model: UserCollection },
+                ],
+                options: { sort: sortOptions },
+            });
         const savedQuestions = userDoc?.saved as any as QuestionDoc[];
-        const hasMorePages = totalQuestions > page * pageSize; // > pastQuestions + savedQuestions.length;
+        const hasMorePages = totalQuestions > pastQuestions + savedQuestions.length;
 
-        return { savedQuestions, hasMorePages };
+        return { questions: savedQuestions, hasMorePages };
     } catch (error) {
         console.log("Failed to retrieve saved questions", error);
         throw new Error("Failed to retrieve saved questions");
@@ -156,7 +158,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
         // create a new question document and return a reference to the question
         const newQuestionDoc: QuestionDoc = await QuestionCollection.create({ title, content, author: author_id });
-        const tagsArray: string[] = [];
+        const tagsArray: Schema.Types.ObjectId[] = [];
 
         // create a new tag document or update existing tag document
         for (const tag of tags) {
@@ -165,7 +167,7 @@ export async function createQuestion(params: CreateQuestionParams) {
                 { $setOnInsert: { name: tag }, $push: { questions: newQuestionDoc._id } }, // if there's a match, we append the new question's objectId to the tag's `questions` array
                 { upsert: true, new: true }, // if there isn't a match, we upsert a new Tag: where `name` = tag and `questions` is an array containing the question's objectId
             );
-            tagsArray.push(existingTag.id);
+            tagsArray.push(existingTag._id);
         }
         // append array of tags into the newly-created question document
         const newDoc = await QuestionCollection.findByIdAndUpdate(
@@ -175,7 +177,14 @@ export async function createQuestion(params: CreateQuestionParams) {
         );
         console.log("Question created successfully", newDoc);
 
-        // Increment author's reputation by +5 points for creating a question
+        // Create an Interaction record for the user's action (Ask question)
+        await InteractionCollection.create({
+            user: author_id,
+            action: "ask_question",
+            question: newQuestionDoc._id,
+            tags: tagsArray,
+        });
+        // Increment author's reputation by +5 for creating a question
         await UserCollection.findByIdAndUpdate(author_id, {
             $inc: { reputation: 5 },
         });
@@ -201,11 +210,12 @@ export async function updateQuestion(params: EditQuestionParams) {
         const existingTags = question.tags as any as TagDoc[];
 
         // Step 2: Identify the updated and replaced tags
-        const updatedTags_ = new Set(updatedTags.map(tag => tag.toLowerCase()));
-        const replacedTags = existingTags.filter(tag => !updatedTags_.has(tag.name.toLowerCase()));
+        const updatedTagNames = new Set(updatedTags.map(tagName => tagName.toLowerCase()));
+        // For each tag in existingTags, we check for its existence in the updatedTags. If it doesn't exist, then it's a replacedTag.
+        const replaced_tags = existingTags.filter(tag => !updatedTagNames.has(tag.name.toLowerCase()));
 
         // Step 3: Remove question_id from the old tags' questions array and delete tags if necessary
-        for (const tag of replacedTags) {
+        for (const tag of replaced_tags) {
             const tagDoc = await TagCollection.findByIdAndUpdate<TagDoc>(
                 tag._id,
                 { $pull: { questions: question_id } },
@@ -248,23 +258,31 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
         await connectToDB();
         let updateQuery = {};
         if (hasUpvoted) {
-            // if user has already upvoted, we pull out/delete the User's ID from upvotes array
+            // if user has already upvoted, pull out/delete the User's ID from upvotes array
             updateQuery = { $pull: { upvotes: user_id } };
         } else if (hasDownvoted) {
-            // if user has downvoted, we pull out/delete user's ID from the downvotes array and append to the upvotes array
+            // if user has downvoted, pull out/delete user's ID from the downvotes array and append to the upvotes array
             updateQuery = { $pull: { downvotes: user_id }, $push: { upvotes: user_id } };
         } else {
-            // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
+            // If user has neither upvoted nor downvoted, add a new upvote of UserId to the set of upvotes
             updateQuery = { $addToSet: { upvotes: user_id } };
         }
-        await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
+        const upvotedQuestion = await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
             new: true,
         });
+        if (!upvotedQuestion) throw new Error("Question not found, hence could not be upvoted");
 
-        // increment user's reputation by +10
-        await UserCollection.findByIdAndUpdate(user_id, {
-            $inc: { reputation: 10 },
-        });
+        if (String(upvotedQuestion.author) !== String(user_id)) {
+            // increment User's reputation by +2 or -2 for upvoting or revoking an upvote to a question
+            await UserCollection.findByIdAndUpdate(user_id, {
+                $inc: { reputation: hasUpvoted ? -2 : 2 },
+            });
+            // increment Author's reputation by +10 or -10 for receiving or deleting an upvote to/from a question
+            await UserCollection.findByIdAndUpdate(upvotedQuestion.author, {
+                $inc: { reputation: hasUpvoted ? -10 : 10 },
+            });
+        }
+
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
         console.log("Failed to upvote question", error);
@@ -289,14 +307,22 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new downvote of UserId to the set of downvotes
             updateQuery = { $addToSet: { downvotes: user_id } };
         }
-        await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
+        const downvotedQuestion = await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
             new: true,
         });
+        if (!downvotedQuestion) throw new Error("Question not found, hence could not be upvoted");
 
-        // increment user's reputation by +10
-        await UserCollection.findByIdAndUpdate(user_id, {
-            $inc: { reputation: 10 },
-        });
+        if (String(downvotedQuestion.author) !== String(user_id)) {
+            // increment User's reputation by +2 or -2 for downvoting or revoking an upvote to a question
+            await UserCollection.findByIdAndUpdate(user_id, {
+                $inc: { reputation: hasDownvoted ? -2 : 2 },
+            });
+            // increment Author's reputation by -10 or +10 for receiving or deleting a downvote to/from a question
+            await UserCollection.findByIdAndUpdate(downvotedQuestion.author, {
+                $inc: { reputation: hasDownvoted ? 10 : -10 },
+            });
+        }
+
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
         console.log("Failed to downvote question", error);
@@ -326,16 +352,18 @@ export async function toggleSaveQuestion(params: SaveQuestionParams) {
 
 export async function fetchUserTopQuestions(params: GetUserStatsParams) {
     const { user_id, page = 1, pageSize = 10 } = params;
+    const pastQuestions = (page - 1) * pageSize;
     try {
         await connectToDB();
         const questions = await QuestionCollection.find<QuestionDoc>({ author: user_id })
-            .limit(page * pageSize)
+            .skip(pastQuestions)
+            .limit(pageSize)
             .populate({ path: "tags", model: TagCollection })
             .populate({ path: "author", model: UserCollection })
-            .sort({ views: -1, upvotes: -1 });
+            .sort({ createdAt: -1, views: -1, upvotes: -1 });
 
         const totalQuestions = await QuestionCollection.countDocuments({ author: user_id });
-        const hasMorePages = totalQuestions > page * pageSize; // > pastQuestions + questions.length;
+        const hasMorePages = totalQuestions > pastQuestions + questions.length;
 
         return { questions, hasMorePages };
     } catch (error) {
@@ -350,10 +378,54 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
     const { question_id, pathToRefetch } = params;
     try {
         await connectToDB();
+        const question = await QuestionCollection.findById<QuestionDoc>(question_id);
+        if (!question) throw new Error("No such question exists, hence cannot be deleted");
+
+        // delete all reputations earned by interactions with this question and its answers
+        await UserCollection.findByIdAndUpdate(question.author, {
+            $inc: { reputation: -5 }, // delete reputation acquired from creating question
+        });
+        if (question.views > 50) {
+            const count = 10 * Math.floor(question.views / 50);
+            await UserCollection.findByIdAndUpdate(question.author, {
+                $inc: { reputation: -count }, // delete reputation acquired from view count
+            });
+        }
+        if (question.upvotes.length > 0) {
+            const count = question.upvotes.length * 10;
+            await UserCollection.findByIdAndUpdate(question.author, {
+                $inc: { reputation: -count },
+            });
+            for (const user_id of question.upvotes) {
+                await UserCollection.findByIdAndUpdate(user_id, {
+                    $inc: { reputation: -2 },
+                });
+            }
+        }
+        if (question.answers.length > 0) {
+            for (const answer_id of question.answers) {
+                const answer = await AnswerCollection.findById<AnswerDoc>(answer_id);
+                await UserCollection.findByIdAndUpdate(answer?.author, {
+                    $inc: { reputation: -10 },
+                });
+                if (answer && answer.upvotes.length > 0) {
+                    const count = answer.upvotes.length * 10;
+                    await UserCollection.findByIdAndUpdate(answer.author, {
+                        $inc: { reputation: -count },
+                    });
+                    for (const user_id of answer.upvotes) {
+                        await UserCollection.findByIdAndUpdate(user_id, {
+                            $inc: { reputation: -2 },
+                        });
+                    }
+                }
+            }
+        }
         await QuestionCollection.deleteOne({ _id: question_id });
         await AnswerCollection.deleteMany({ question: question_id });
         await InteractionCollection.deleteMany({ question: question_id });
         await TagCollection.updateMany({ questions: question_id }, { $pull: { questions: question_id } });
+
         if (pathToRefetch) revalidatePath(pathToRefetch);
     } catch (error) {
         console.log("Failed to delete question", error);

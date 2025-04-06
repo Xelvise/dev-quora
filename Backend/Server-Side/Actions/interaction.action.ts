@@ -5,6 +5,7 @@ import connectToDB from "../database.connector";
 import { ViewQuestionParams } from "../parameters";
 import InteractionCollection, { InteractionDoc } from "@/Backend/Database/interaction.collection";
 import { revalidatePath } from "next/cache";
+import UserCollection from "@/Backend/Database/user.collection";
 
 export async function viewQuestion(params: ViewQuestionParams) {
     const { question_id, user_id, clientIP, pathToRefetch } = params;
@@ -25,6 +26,12 @@ export async function viewQuestion(params: ViewQuestionParams) {
                     revalidatePath(pathToRefetch);
                     revalidatePath("/");
                 }
+            }
+            const question = await QuestionCollection.findById<QuestionDoc>(question_id);
+            if (question && question.views > 50) {
+                await UserCollection.findByIdAndUpdate(question.author, {
+                    $inc: { reputation: 10 * Math.floor(question.views / 50) },
+                });
             }
         } else if (clientIP) {
             // If user_id is undefined, then we assume viewer is not signed-in

@@ -8,10 +8,12 @@ import QuestionCollection from "@/Backend/Database/question.collection";
 import AnswerCollection from "@/Backend/Database/answer.collection";
 import { FilterQuery } from "mongoose";
 import { redirect } from "next/navigation";
+import { BadgeCriteriaType } from "@/types";
+import { assignBadges } from "@/app/utils";
 
 export async function getSignedInUser(clerk_id: string | null) {
     try {
-        connectToDB();
+        await connectToDB();
         const user = await UserCollection.findOne<UserDoc>({ clerkId: clerk_id });
         return user;
     } catch (error) {
@@ -24,9 +26,38 @@ export async function fetchUserProfileInfo(clerkId: string | null) {
     try {
         await connectToDB();
         const user = await UserCollection.findOne<UserDoc>({ clerkId });
-        const totalQuestions = await QuestionCollection.countDocuments({ author: user?._id });
-        const totalAnswers = await AnswerCollection.countDocuments({ author: user?._id });
-        return { user, totalQuestions, totalAnswers };
+        if (!user) throw new Error(`User with clerk_id - "${clerkId}" does not exist`);
+        const totalQuestions = await QuestionCollection.countDocuments({ author: user._id }); // total number of questions the User has authored
+        const totalAnswers = await AnswerCollection.countDocuments({ author: user._id }); // total number of answers the User has authored
+
+        // Calculate total upvotes on questions that can be attributed to User
+        const [QuestionUpvotesDoc] = await QuestionCollection.aggregate([
+            { $match: { author: user._id } },
+            { $project: { _id: 0, upvote_count: { $size: "$upvotes" } } },
+            { $group: { _id: null, totalUpvotes: { $sum: "$upvotes" } } },
+        ]);
+        // Calculate total upvotes on answers that can be attributed to User
+        const [AnswerUpvotesDoc] = await AnswerCollection.aggregate([
+            { $match: { author: user._id } },
+            { $project: { _id: 0, upvote_count: { $size: "$upvotes" } } },
+            { $group: { _id: null, totalUpvotes: { $sum: "$upvotes" } } },
+        ]);
+        // Calculate User's view count
+        const [QuestionViewCountDoc] = await QuestionCollection.aggregate([
+            { $match: { author: user._id } },
+            { $group: { _id: null, totalViewCount: { $sum: "$views" } } },
+        ]);
+
+        const criteria = [
+            { type: "QUESTION_COUNT" as BadgeCriteriaType, count: totalQuestions },
+            { type: "ANSWER_COUNT" as BadgeCriteriaType, count: totalAnswers },
+            { type: "QUESTION_UPVOTES" as BadgeCriteriaType, count: QuestionUpvotesDoc?.totalUpvotes || 0 },
+            { type: "ANSWER_UPVOTES" as BadgeCriteriaType, count: AnswerUpvotesDoc?.totalUpvotes || 0 },
+            { type: "TOTAL_VIEWS" as BadgeCriteriaType, count: QuestionViewCountDoc?.totalViewCount || 0 },
+        ];
+
+        const badgeCounts = assignBadges({ criteria });
+        return { user, totalQuestions, totalAnswers, badgeCounts };
     } catch (error) {
         console.error("User could not be found", error);
         throw new Error("User could not be found");

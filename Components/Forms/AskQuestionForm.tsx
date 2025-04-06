@@ -2,7 +2,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,14 +23,14 @@ import { useRouter } from "next/navigation";
 interface Props {
     formType?: "update" | "create";
     user_id: string | null;
-    previousQuestion?: any;
+    stringifiedPrevQuestion?: any;
 }
 
-export default function AskQuestionForm({ formType = "create", user_id, previousQuestion }: Props) {
+export default function AskQuestionForm({ formType = "create", user_id, stringifiedPrevQuestion }: Props) {
     const { mode } = useTheme(); // used to decide the theme of the editor
     const router = useRouter();
 
-    const prevQuestion: QuestionDoc = previousQuestion ? JSON.parse(previousQuestion) : {};
+    const prevQuestion: QuestionDoc = stringifiedPrevQuestion ? JSON.parse(stringifiedPrevQuestion) : {};
     const tags = prevQuestion?.tags?.map((tag: any) => tag.name as string) || [];
 
     const form = useForm<z.infer<typeof AskQuestionSchema>>({

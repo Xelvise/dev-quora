@@ -6,6 +6,7 @@ export type SavedQuestionFilter = "most_recent" | "oldest" | "most_voted" | "mos
 export type AnswerFilter = "highestUpvotes" | "lowestUpvotes" | "recent" | "old";
 export type UserFilter = "new_users" | "old_users" | "top_contributors";
 export type TagFilter = "popular" | "recent" | "name" | "old";
+export type SearchFilter = "question" | "answer" | "user" | "tag";
 
 export interface GetQuestionsParams {
     page?: number;
@@ -65,8 +66,8 @@ export interface DeleteAnswerParams {
 }
 
 export interface SearchParams {
-    query?: string | null;
-    type?: string | null;
+    query?: string;
+    type?: string;
 }
 
 export interface RecommendedParams {

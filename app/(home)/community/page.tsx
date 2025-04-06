@@ -2,9 +2,8 @@ import { fetchUsers } from "@/Backend/Server-Side/Actions/user.action";
 import { UserFilter } from "@/Backend/Server-Side/parameters";
 import UserCard from "@/Components/Cards/UserCard";
 import Filters from "@/Components/Generic/Filters";
-import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
 import NoResults from "@/Components/Generic/NoResults";
-import { LocalSearchBar } from "@/Components/Generic/SearchBar";
+import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import { UserFilters } from "@/Constants/filters";
 
 interface Props {
@@ -35,7 +34,6 @@ export default async function Community({ searchParams }: Props) {
                 ) : (
                     <NoResults title="No Users yet" />
                 )}
-                {/* <PopulateQuestionData hasMorePages={hasMorePages} /> */}
             </section>
         </main>
     );

@@ -1,8 +1,8 @@
 import { fetchQuestionsByTagID } from "@/Backend/Server-Side/Actions/tag.action";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import QuestionCard from "@/Components/Cards/QuestionCard";
-import PopulateQuestionData from "@/Components/Generic/PopulateQuestionData";
-import { LocalSearchBar } from "@/Components/Generic/SearchBar";
+
+import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import { auth } from "@clerk/nextjs/server";
 
 interface Props {
@@ -18,7 +18,7 @@ export default async function TagDetails({ params, searchParams }: Props) {
     const user = await getSignedInUser(clerkId);
 
     try {
-        const { tagTitle, questions, hasMorePages, isFetching } = await fetchQuestionsByTagID({
+        const { tagTitle, questions, hasMorePages } = await fetchQuestionsByTagID({
             tag_id: id,
             searchQuery: q,
             page: page ? +page : 1,

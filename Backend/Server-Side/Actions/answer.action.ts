@@ -24,8 +24,22 @@ export async function createAnswer(params: CreateAnswerParams) {
             question: question_id,
         });
         // append the answer's objectId to its question's `answers` field
-        await QuestionCollection.findByIdAndUpdate(question_id, { $push: { answers: newAnswerDoc._id } });
-        // TODO: Add Interaction...
+        const question = await QuestionCollection.findByIdAndUpdate(question_id, {
+            $push: { answers: newAnswerDoc._id },
+        });
+        // Create an Interaction record for the user's action (create answer)
+        await InteractionCollection.create({
+            user: author_id,
+            action: "create_answer",
+            answer: newAnswerDoc._id,
+            tags: question?.tags,
+        });
+        // Increment author's reputation by +10 for creating an answer
+        if (String(question.author) !== String(author_id)) {
+            await UserCollection.findByIdAndUpdate(author_id, {
+                $inc: { reputation: 10 },
+            });
+        }
 
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
@@ -38,19 +52,15 @@ export async function createAnswer(params: CreateAnswerParams) {
 
 export async function fetchAnswers(params: GetAnswersParams) {
     const { question_id, page = 1, pageSize = 5, filter = "recent" } = params;
-    // const past_pages = (page - 1) * pageSize;
-    let isFetching = true;
+    const past_pages = (page - 1) * pageSize;
     try {
         connectToDB();
         const answers_ = AnswerCollection.find<AnswerDoc>({ question: question_id })
-            // .skip(past_pages)
-            .limit(page * pageSize)
+            .skip(past_pages)
+            .limit(pageSize)
             .populate({ path: "author", model: UserCollection });
 
-        const totalAnswers = await AnswerCollection.countDocuments({ question: question_id });
-        const hasMorePages = totalAnswers > page * pageSize; // > past_pages + (await answers_).length;
-
-        let answers;
+        let answers: AnswerDoc[];
         if (filter === "recent") {
             answers = await answers_.sort({ createdAt: -1 });
         } else if (filter === "old") {
@@ -62,11 +72,36 @@ export async function fetchAnswers(params: GetAnswersParams) {
         } else {
             throw new Error("Invalid filter");
         }
-        isFetching = false;
-        return { answers, hasMorePages, isFetching };
+
+        const totalAnswers = await AnswerCollection.countDocuments({ question: question_id });
+        const hasMorePages = totalAnswers > past_pages + answers.length;
+        return { answers, hasMorePages, totalAnswers };
     } catch (error) {
         console.log("Failed to fetch answers", error);
         throw new Error("Failed to fetch answers");
+    } finally {
+        // await mongoose.connection.close();
+    }
+}
+
+export async function fetchUserTopAnswers(params: GetUserStatsParams) {
+    const { user_id, page = 1, pageSize = 5 } = params;
+    const past_pages = (page - 1) * pageSize;
+    try {
+        await connectToDB();
+        const answers = await AnswerCollection.find<AnswerDoc>({ author: user_id })
+            .skip(past_pages)
+            .limit(pageSize)
+            .populate({ path: "question", model: QuestionCollection })
+            .populate({ path: "author", model: UserCollection })
+            .sort({ createdAt: -1, upvotes: -1 });
+
+        const totalAnswers = await AnswerCollection.countDocuments({ author: user_id });
+        const hasMorePages = totalAnswers > past_pages + answers.length;
+        return { answers, hasMorePages };
+    } catch (error) {
+        console.log("Failed to User's top questions", error);
+        throw new Error("Failed to User's top questions");
     } finally {
         // await mongoose.connection.close();
     }
@@ -87,15 +122,21 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
             updateQuery = { $addToSet: { upvotes: user_id } };
         }
-        const question = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
+        const upvotedAnswer = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
             new: true,
         });
-        if (!question) throw new Error("Question not found");
+        if (!upvotedAnswer) throw new Error("Answer not found, hence could not be upvoted");
 
-        // increment user's reputation by +10
-        await UserCollection.findByIdAndUpdate(user_id, {
-            $inc: { reputation: 10 },
-        });
+        if (String(upvotedAnswer.author) !== String(user_id)) {
+            // increment User's reputation by +2 or -2 for upvoting or revoking an upvote to a question
+            await UserCollection.findByIdAndUpdate(user_id, {
+                $inc: { reputation: hasUpvoted ? -2 : 2 },
+            });
+            // increment Author's reputation by +10 or -10 for receiving or deleting an upvote to/from a question
+            await UserCollection.findByIdAndUpdate(upvotedAnswer.author, {
+                $inc: { reputation: hasUpvoted ? -10 : 10 },
+            });
+        }
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
         console.log("Failed to upvote question", error);
@@ -120,44 +161,25 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
             // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
             updateQuery = { $addToSet: { downvotes: user_id } };
         }
-        const question = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
+        const downvotedAnswer = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
             new: true,
         });
-        if (!question) throw new Error("Question not found");
+        if (!downvotedAnswer) throw new Error("Answer not found, hence could not be downvoted");
 
-        // increment user's reputation by +10
-        await UserCollection.findByIdAndUpdate(user_id, {
-            $inc: { reputation: 10 },
-        });
+        if (String(downvotedAnswer.author) !== String(user_id)) {
+            // increment User's reputation by +2 or -2 for downvoting or revoking an upvote to a question
+            await UserCollection.findByIdAndUpdate(user_id, {
+                $inc: { reputation: hasDownvoted ? -2 : 2 },
+            });
+            // increment Author's reputation by -10 or +10 for receiving or deleting a downvote to/from a question
+            await UserCollection.findByIdAndUpdate(downvotedAnswer.author, {
+                $inc: { reputation: hasDownvoted ? 10 : -10 },
+            });
+        }
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
-        console.log("Failed to downvote question", error);
-        throw new Error("Failed to downvote question");
-    } finally {
-        // await mongoose.connection.close();
-    }
-}
-
-export async function fetchUserTopAnswers(params: GetUserStatsParams) {
-    const { user_id, page = 1, pageSize = 10 } = params;
-    // const past_pages = (page - 1) * pageSize;
-    let isFetching = true;
-    try {
-        await connectToDB();
-        const answers = await AnswerCollection.find<AnswerDoc>({ author: user_id })
-            // .skip(past_pages)
-            .limit(page * pageSize)
-            .populate({ path: "question", model: QuestionCollection })
-            .populate({ path: "author", model: UserCollection })
-            .sort({ upvotes: -1 });
-
-        const totalAnswers = await AnswerCollection.countDocuments({ author: user_id });
-        const hasMorePages = totalAnswers > page * pageSize;
-        isFetching = false;
-        return { answers, hasMorePages, isFetching };
-    } catch (error) {
-        console.log("Failed to User's top questions", error);
-        throw new Error("Failed to User's top questions");
+        console.log("Failed to downvote answer", error);
+        throw new Error("Failed to downvote answer");
     } finally {
         // await mongoose.connection.close();
     }
@@ -169,8 +191,23 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
         await connectToDB();
         console.log("Answer_id provided: ", answer_id);
         const answer = await AnswerCollection.findById<AnswerDoc>(answer_id);
-        if (!answer) throw new Error("Answer not found");
+        if (!answer) throw new Error("Answer not found, hence cannot be deleted");
 
+        // delete all reputations earned by interactions with this answer
+        await UserCollection.findByIdAndUpdate(answer.author, {
+            $inc: { reputation: -10 }, // delete reputation acquired from creating answer
+        });
+        if (answer.upvotes.length > 0) {
+            const count = answer.upvotes.length * 10;
+            await UserCollection.findByIdAndUpdate(answer.author, {
+                $inc: { reputation: -count },
+            });
+            for (const user_id of answer.upvotes) {
+                await UserCollection.findByIdAndUpdate(user_id, {
+                    $inc: { reputation: -2 },
+                });
+            }
+        }
         await AnswerCollection.deleteOne({ _id: answer_id });
         await QuestionCollection.updateMany({ _id: answer.question }, { $pull: { answers: answer_id } });
         await InteractionCollection.deleteMany({ answer: answer_id });
