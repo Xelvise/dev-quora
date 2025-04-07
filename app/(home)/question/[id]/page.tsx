@@ -97,11 +97,11 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
                 />
             </div>
 
-            <ContentParser content={question.content} />
+            <ContentParser content={question.content} display="question" />
 
             <AnswerLayout
-                stringifiedFetchedData={JSON.stringify(data)}
-                currentPage={page}
+                stringifiedData={data}
+                question_id={id}
                 stringifiedQuestionTags={JSON.stringify(question.tags)}
                 stringifiedSignedInUser={JSON.stringify(signedInUser)}
                 clientIP={ip}

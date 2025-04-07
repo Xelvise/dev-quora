@@ -34,7 +34,6 @@ export function GlobalSearchBar({ placeholder, removeIcon, assetIcon, inputClass
                 newURL.searchParams.delete("global");
                 newURL.searchParams.delete("type");
             }
-            newURL.searchParams.delete("page");
             router.push(newURL.toString(), { scroll: false });
         }, 1000);
         return () => clearTimeout(debounceDelayFn);

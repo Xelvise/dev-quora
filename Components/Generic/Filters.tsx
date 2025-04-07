@@ -33,7 +33,6 @@ export default function Filters({ type, filterData, defaultFilterValue, placehol
         pathname === "/" ? sendFilterToContext(value) : setSelectedFilter(value);
         const newURL = new URL(window.location.href);
         newURL.searchParams.set("filter", value);
-        newURL.searchParams.delete("page");
         router.push(newURL.toString(), { scroll: false });
     }
 

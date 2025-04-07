@@ -2,34 +2,28 @@ import Filters from "@/Components/Generic/Filters";
 import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import { QuestionFilters } from "@/Constants/filters";
 import NoResults from "@/Components/Generic/NoResults";
-import QuestionCard from "@/Components/Cards/QuestionCard";
 import { fetchSavedQuestions } from "@/Backend/Server-Side/Actions/question.action";
 import { auth } from "@clerk/nextjs/server";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import { redirect } from "next/navigation";
 import { SavedQuestionFilter } from "@/Backend/Server-Side/parameters";
+import PopulateQuestionCard from "@/Components/Populators/PopulateQuestionCard";
 
 interface Props {
     searchParams: Promise<{
         q?: string;
         filter?: SavedQuestionFilter;
-        page?: string;
     }>;
 }
 
 export default async function SavedCollection({ searchParams }: Props) {
-    const { q, filter, page } = await searchParams;
+    const { q, filter } = await searchParams;
     const { userId: clerkId } = await auth();
-    if (!clerkId) return redirect("/"); // render a Toaster saying "You need to be logged in to view Saved questions"
+    if (!clerkId) return redirect("/sign-in"); // render a Toaster saying "You need to be logged in to view Saved questions"
     const user = await getSignedInUser(clerkId);
 
     try {
-        const { questions: savedQuestions, hasMorePages } = await fetchSavedQuestions({
-            clerk_id: clerkId,
-            searchQuery: q,
-            filter,
-            page: page ? +page : 1,
-        });
+        const data = await fetchSavedQuestions({ clerk_id: clerkId, searchQuery: q, filter });
 
         return (
             <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
@@ -41,20 +35,19 @@ export default async function SavedCollection({ searchParams }: Props) {
                     </div>
                 </div>
 
-                <div className="flex w-full flex-col gap-6">
-                    {savedQuestions.length > 0 ? (
-                        savedQuestions.map(question => (
-                            <QuestionCard key={question.id} question={question} signedInUser={user} />
-                        ))
-                    ) : (
-                        <NoResults
-                            title="No Saved Questions Found"
-                            desc="It appears there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
-                            link="/"
-                            linkTitle="Explore Questions"
-                        />
-                    )}
-                </div>
+                <PopulateQuestionCard
+                    serverAction="fetchSavedQuestions"
+                    clerk_id={clerkId}
+                    stringifiedInitialData={data}
+                    stringifiedSignedInUser={JSON.stringify(user)}
+                >
+                    <NoResults
+                        title="No Saved Questions Found"
+                        desc="It appears there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
+                        link="/"
+                        linkTitle="Explore Questions"
+                    />
+                </PopulateQuestionCard>
             </main>
         );
     } catch (error) {

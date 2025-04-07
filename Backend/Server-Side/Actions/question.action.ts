@@ -55,7 +55,7 @@ export async function fetchQuestions(params: GetQuestionsParams) {
         const totalQuestions = await QuestionCollection.countDocuments(filterQuery);
         const hasMorePages = totalQuestions > pastQuestions + questions.length;
         console.log("Questions retrieved successfully", questions);
-        return { questions, hasMorePages };
+        return JSON.stringify({ questions, hasMorePages });
     } catch (error) {
         console.log("Failed to retrieve questions", error);
         throw new Error("Failed to retrieve questions");
@@ -114,7 +114,7 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
         const savedQuestions = userDoc?.saved as any as QuestionDoc[];
         const hasMorePages = totalQuestions > pastQuestions + savedQuestions.length;
 
-        return { questions: savedQuestions, hasMorePages };
+        return JSON.stringify({ questions: savedQuestions, hasMorePages });
     } catch (error) {
         console.log("Failed to retrieve saved questions", error);
         throw new Error("Failed to retrieve saved questions");
@@ -365,7 +365,7 @@ export async function fetchUserTopQuestions(params: GetUserStatsParams) {
         const totalQuestions = await QuestionCollection.countDocuments({ author: user_id });
         const hasMorePages = totalQuestions > pastQuestions + questions.length;
 
-        return { questions, hasMorePages };
+        return JSON.stringify({ questions, hasMorePages });
     } catch (error) {
         console.log("Failed to User's top questions", error);
         throw new Error("Failed to User's top questions");

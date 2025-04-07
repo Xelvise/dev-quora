@@ -7,7 +7,6 @@ export default async function AskQuestion() {
     const { userId: clerkId } = await auth();
     if (!clerkId) redirect("/sign-in");
     const user = await getSignedInUser(clerkId);
-    console.log("SignedInUser: ", user);
 
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col">

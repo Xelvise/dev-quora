@@ -17,17 +17,16 @@ interface Props {
     searchParams: Promise<{ page?: string }>;
 }
 
-export default async function Profile({ params, searchParams }: Props) {
+export default async function Profile({ params }: Props) {
     const { id } = await params;
-    const { page } = await searchParams;
 
     const { userId: signedInUserId } = await auth();
     const signedInUser = await getSignedInUser(signedInUserId);
 
     const { user, totalQuestions, totalAnswers, badgeCounts } = await fetchUserProfileInfo(id);
     if (!user) redirect("/community"); // TODO: render a Toaster saying "User profile does not exist"
-    const questionData = await fetchUserTopQuestions({ user_id: user.id, page: page ? +page : 1 });
-    const answerData = await fetchUserTopAnswers({ user_id: user.id, page: page ? +page : 1 });
+    const questionData = await fetchUserTopQuestions({ user_id: user.id });
+    const answerData = await fetchUserTopAnswers({ user_id: user.id });
 
     return (
         <main className="flex max-w-5xl flex-1 flex-col">
@@ -79,8 +78,9 @@ export default async function Profile({ params, searchParams }: Props) {
                 reputation={user.reputation}
             />
             <QuestionAnswerTab
-                stringifiedQuestionData={JSON.stringify(questionData)}
-                stringifiedAnswerData={JSON.stringify(answerData)}
+                user_id={user.id}
+                stringifiedQuestionData={questionData}
+                stringifiedAnswerData={answerData}
                 stringifiedSignedInUser={JSON.stringify(signedInUser)}
             />
         </main>

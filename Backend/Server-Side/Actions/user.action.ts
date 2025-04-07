@@ -57,6 +57,7 @@ export async function fetchUserProfileInfo(clerkId: string | null) {
         ];
 
         const badgeCounts = assignBadges({ criteria });
+        console.log("Results: ", badgeCounts.GOLD, badgeCounts.SILVER, badgeCounts.BRONZE);
         return { user, totalQuestions, totalAnswers, badgeCounts };
     } catch (error) {
         console.error("User could not be found", error);

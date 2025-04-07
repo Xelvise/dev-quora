@@ -32,7 +32,6 @@ export function LocalSearchBar({ placeholder, removeIcon, assetIcon, inputClassN
             } else {
                 newURL.searchParams.delete("q");
             }
-            newURL.searchParams.delete("page");
             router.push(newURL.toString(), { scroll: false });
         }, 1000)
         return () => clearTimeout(debounceDelayFn)

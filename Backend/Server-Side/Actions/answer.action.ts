@@ -75,7 +75,7 @@ export async function fetchAnswers(params: GetAnswersParams) {
 
         const totalAnswers = await AnswerCollection.countDocuments({ question: question_id });
         const hasMorePages = totalAnswers > past_pages + answers.length;
-        return { answers, hasMorePages, totalAnswers };
+        return JSON.stringify({ answers, hasMorePages, totalAnswers });
     } catch (error) {
         console.log("Failed to fetch answers", error);
         throw new Error("Failed to fetch answers");
@@ -98,7 +98,7 @@ export async function fetchUserTopAnswers(params: GetUserStatsParams) {
 
         const totalAnswers = await AnswerCollection.countDocuments({ author: user_id });
         const hasMorePages = totalAnswers > past_pages + answers.length;
-        return { answers, hasMorePages };
+        return JSON.stringify({ answers, hasMorePages });
     } catch (error) {
         console.log("Failed to User's top questions", error);
         throw new Error("Failed to User's top questions");
@@ -139,8 +139,8 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
         }
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
-        console.log("Failed to upvote question", error);
-        throw new Error("Failed to upvote question");
+        console.log("Failed to upvote answer", error);
+        throw new Error("Failed to upvote answer");
     } finally {
         // await mongoose.connection.close();
     }

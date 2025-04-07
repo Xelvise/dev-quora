@@ -19,7 +19,7 @@ import { QuestionDoc } from "@/Backend/Database/question.collection";
 
 interface Props {
     signedInUserId: string | null;
-    stringifiedQuestion: any;
+    stringifiedQuestion: string;
 }
 
 export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Props) {
@@ -42,7 +42,7 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
             // Call a server action to submit an answer
             await createAnswer({
                 content: data.answer,
-                question_id: question.id,
+                question_id: String(question._id),
                 author_id: signedInUserId,
                 pathToRefetch: pathname,
             });
@@ -58,24 +58,28 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
     };
 
     const generate_AI_answer = async () => {
-        if (!signedInUserId) throw new Error("Something went wrong. Kindly Sign-in to generate an answer");
+        if (!signedInUserId) return; //TODO: a Toaster ("Something went wrong. Kindly Sign-in to generate an answer");
         setGeneration(true);
         try {
+            console.log("Generating AI answer...");
             const response = await fetch(`${window.location.origin}/api/answer-generator`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: stringifiedQuestion,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: question.title, content: question.content }),
             });
-            const ai_answer = await response.json();
-            alert(ai_answer.alert);
+            const data = await response.json();
             if (response.ok) {
-                if (editorRef.current) (editorRef.current as any).setContent(ai_answer.message);
+                if (editorRef.current) (editorRef.current as any).setContent(data.message.replace(/\n/g, "<br />"));
+                // TODO: Add a toast notification to inform user of successful AI answer generation
+            } else {
+                console.log("Server error: ", data.error);
+                // TODO: a Toaster (data.error)
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            console.error("Network Error:", error.message);
+            // TODO: a Toaster ("AI answer generation failed. Please, try again");
         } finally {
+            setGeneration(false);
         }
     };
 
@@ -89,8 +93,22 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                     className="body-regular dark:solid-light-border flex w-fit gap-2 rounded-[7px] p-3 text-primary-500 dark:text-primary-300"
                     onClick={generate_AI_answer}
                 >
-                    <Image src="/assets/icons/stars.svg" alt="star" width={12} height={12} className="object-contain" />
-                    Generate an AI answer
+                    {isGenerating ? (
+                        <>
+                            <Spinner /> Generating
+                        </>
+                    ) : (
+                        <>
+                            <Image
+                                src="/assets/icons/stars.svg"
+                                alt="star"
+                                width={12}
+                                height={12}
+                                className="object-contain"
+                            />
+                            Generate an AI answer
+                        </>
+                    )}
                 </Button>
             </div>
 

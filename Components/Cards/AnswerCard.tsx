@@ -42,7 +42,7 @@ export default function AnswerCard({ answer, signedInUser }: Props) {
                 <div className="flex items-center gap-2 self-end">
                     {/* prettier-ignore */}
                     <VoteSection
-                          postType="question"
+                          postType="answer"
                           post_id={String(answer._id)}
                           userId={signedInUser ? String(signedInUser._id) : null}
                           upvotes={answer.upvotes.length}
@@ -54,7 +54,7 @@ export default function AnswerCard({ answer, signedInUser }: Props) {
                 </div>
             </div>
 
-            <ContentParser content={answer.content} />
+            <ContentParser content={answer.content} display="answer" />
         </article>
     );
 }

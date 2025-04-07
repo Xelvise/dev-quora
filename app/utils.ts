@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import qs from "query-string";
 import { BADGE_CRITERIA } from "@/Constants";
 import { BadgeCounts, BadgeCriteriaType } from "@/types";
 
@@ -53,36 +52,36 @@ export function parseDate(date: Date) {
 }
 
 // prettier-ignore
-export function appendToQueryParams(params: { queryParamStr: string; queryKey: string; queryValue: string }) {
-    const { queryParamStr, queryKey, queryValue } = params;
-    const queryParamObj = qs.parse(queryParamStr);
-    console.log("query-string object after parse: ", queryParamObj)
-    queryParamObj[queryKey] = queryValue;
+// export function appendToQueryParams(params: { queryParamStr: string; queryKey: string; queryValue: string }) {
+//     const { queryParamStr, queryKey, queryValue } = params;
+//     const queryParamObj = qs.parse(queryParamStr);
+//     console.log("query-string object after parse: ", queryParamObj)
+//     queryParamObj[queryKey] = queryValue;
 
-    return qs.stringifyUrl(
-        {
-            url: window.location.pathname,
-            query: queryParamObj,
-        },
-        { skipNull: true },
-    );
-}
+//     return qs.stringifyUrl(
+//         {
+//             url: window.location.pathname,
+//             query: queryParamObj,
+//         },
+//         { skipNull: true },
+//     );
+// }
 
 // prettier-ignore
-export function removeFromQueryParams(params: { queryParamStr: string; queryKeys: string[]; }) {
-    const { queryParamStr, queryKeys } = params;
-    const queryParamObj = qs.parse(queryParamStr);
-    console.log("query-string object after parse: ", queryParamObj)
-    queryKeys.forEach(key => delete queryParamObj[key]);
+// export function removeFromQueryParams(params: { queryParamStr: string; queryKeys: string[]; }) {
+//     const { queryParamStr, queryKeys } = params;
+//     const queryParamObj = qs.parse(queryParamStr);
+//     console.log("query-string object after parse: ", queryParamObj)
+//     queryKeys.forEach(key => delete queryParamObj[key]);
 
-    return qs.stringifyUrl(
-        {
-            url: window.location.pathname,
-            query: queryParamObj,
-        },
-        { skipNull: true },
-    );
-}
+//     return qs.stringifyUrl(
+//         {
+//             url: window.location.pathname,
+//             query: queryParamObj,
+//         },
+//         { skipNull: true },
+//     );
+// }
 
 export function findFilterNameByValue(filterArray: { name: string; value: string }[], targetValue: string | undefined) {
     if (!targetValue) return targetValue;

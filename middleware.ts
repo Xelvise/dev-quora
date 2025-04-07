@@ -11,14 +11,6 @@ export default clerkMiddleware(async (auth, req) => {
     }
 });
 
-// ALTERNATIVELY,
-// export default clerkMiddleware(async (auth, req) => {
-//     const { userId, redirectToSignIn } = await auth();
-//     if (!userId && isProtectedRoute(req)) {
-//         return redirectToSignIn({returnBackUrl: req.url});
-//     }
-// });
-
 export const config = {
     matcher: [
         // Skip Next.js internals and all static files, unless found in search params
