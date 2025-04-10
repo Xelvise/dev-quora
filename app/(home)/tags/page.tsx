@@ -11,13 +11,12 @@ interface Props {
     searchParams: Promise<{
         q?: string;
         filter?: TagFilter;
-        page?: string;
     }>;
 }
 
 export default async function Tags({ searchParams }: Props) {
-    const { q, filter, page } = await searchParams;
-    const { tags, hasMorePages, isFetching } = await fetchAllTags({ searchQuery: q, filter, page: page ? +page : 1 });
+    const { q, filter } = await searchParams;
+    const { tags } = await fetchAllTags({ searchQuery: q, filter });
 
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7">
@@ -44,7 +43,6 @@ export default async function Tags({ searchParams }: Props) {
                         linkTitle="Ask a question"
                     />
                 )}
-                {/* <PopulateQuestionData hasNextPage={hasMorePages} isFetching={isFetching}/> */}
             </section>
         </main>
     );

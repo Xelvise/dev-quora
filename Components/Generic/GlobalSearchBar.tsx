@@ -58,6 +58,7 @@ export function GlobalSearchBar({ placeholder, removeIcon, assetIcon, inputClass
 
     // Close the modal when the pathname changes
     useEffect(() => {
+        setSearchValue("")
         setOpenState(false);
     }, [pathname]);
 

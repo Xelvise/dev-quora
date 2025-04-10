@@ -12,7 +12,7 @@ interface Props {
 export default function UserStats({ totalAnswers, totalQuestions, badgeCounts, reputation }: Props) {
     return (
         <div className="mt-14">
-            <p className="h3-semibold text-dark400_light900 mb-3">Rank: {reputation}</p>
+            <p className="base-semibold text-dark400_light900 mb-3">Reputation Level: {reputation}</p>
             <div className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-4">
                 <div className="light-border bg-light900_dark300 flex flex-wrap items-center gap-4 rounded-md border p-6 shadow-light-300 dark:shadow-dark-200">
                     <div>

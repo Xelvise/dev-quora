@@ -1,4 +1,4 @@
-import { fetchQuestionsByTagID } from "@/Backend/Server-Side/Actions/tag.action";
+import { fetchAllQuestionsByTagID } from "@/Backend/Server-Side/Actions/tag.action";
 import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import QuestionCard from "@/Components/Cards/QuestionCard";
 
@@ -12,17 +12,13 @@ interface Props {
 
 export default async function TagDetails({ params, searchParams }: Props) {
     const { id } = await params;
-    const { q, page } = await searchParams;
+    const { q } = await searchParams;
 
     const { userId: clerkId } = await auth();
     const user = await getSignedInUser(clerkId);
 
     try {
-        const { tagTitle, questions, hasMorePages } = await fetchQuestionsByTagID({
-            tag_id: id,
-            searchQuery: q,
-            page: page ? +page : 1,
-        });
+        const { tagTitle, questions } = await fetchAllQuestionsByTagID({ tag_id: id, searchQuery: q });
         return (
             <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
                 <h1 className="h1-bold text-dark300_light900">{tagTitle}</h1>
@@ -35,7 +31,6 @@ export default async function TagDetails({ params, searchParams }: Props) {
                     {questions.map(question => (
                         <QuestionCard key={question.id} question={question} signedInUser={user} />
                     ))}
-                    {/* <PopulateQuestionData hasNextPage={hasMorePages} isFetching={isFetching} /> */}
                 </div>
             </main>
         );

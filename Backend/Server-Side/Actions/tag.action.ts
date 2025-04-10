@@ -9,13 +9,9 @@ import QuestionCollection, { QuestionDoc } from "@/Backend/Database/question.col
 export async function fetchAllTags(params: GetAllTagsParams) {
     const { page = 1, pageSize = 20, filter = "recent", searchQuery } = params;
     const filterQuery = searchQuery ? { name: { $regex: new RegExp(searchQuery, "i") } } : {};
-    // const past_pages = (page - 1) * pageSize;
-    let isFetching = true;
     try {
         await connectToDB();
-        const tags_ = TagCollection.find<TagDoc>(filterQuery).limit(page * pageSize); // .skip(past_pages).limit(pageSize)
-        const totalTags = await TagCollection.countDocuments(filterQuery);
-        const hasMorePages = totalTags > page * pageSize; // past_pages + (await tags_).length;
+        const tags_ = TagCollection.find<TagDoc>(filterQuery);
 
         let tags;
         if (filter === "recent") {
@@ -30,8 +26,7 @@ export async function fetchAllTags(params: GetAllTagsParams) {
         } else {
             throw new Error("Invalid Filter");
         }
-        isFetching = false;
-        return { tags, hasMorePages, isFetching };
+        return { tags };
     } catch (error) {
         console.error("Error occured while fetching all tags", error);
         throw new Error("Error occured while fetching all tags");
@@ -72,36 +67,27 @@ export async function fetchTopInteractedTags(params: TopInteractedTagsParams): P
     }
 }
 
-export async function fetchQuestionsByTagID(params: QuestionsByTagIdParams) {
+export async function fetchAllQuestionsByTagID(params: QuestionsByTagIdParams) {
     const { tag_id, page = 1, pageSize = 5, searchQuery } = params;
     const filterQuery = searchQuery ? { title: { $regex: new RegExp(searchQuery, "i") } } : {};
-    const past_pages = (page - 1) * pageSize;
 
     try {
         await connectToDB();
-
-        // Fetch the tag document
-        const tagDoc = await TagCollection.findById<TagDoc>(tag_id);
-        if (!tagDoc) throw new Error("Tag not found");
-
-        const totalQuestions = tagDoc.questions.length;
-
         // Create a new query to fetch paginated and populated questions
-        const populatedTagDoc = await TagCollection.findById<TagDoc>(tag_id).populate({
+        const tagDoc = await TagCollection.findById<TagDoc>(tag_id).populate({
             path: "questions",
             model: QuestionCollection,
             match: filterQuery,
-            options: { skip: past_pages, limit: pageSize, sort: { createdAt: -1 } },
+            options: { sort: { createdAt: -1 } },
             populate: [
                 { path: "tags", model: TagCollection },
                 { path: "author", model: UserCollection },
             ],
         });
+        if (!tagDoc) throw new Error("Tag not found");
+        const questions = tagDoc.questions as any as QuestionDoc[];
 
-        const questions = populatedTagDoc!.questions as any as QuestionDoc[];
-        const hasMorePages = totalQuestions > past_pages + questions.length;
-
-        return { tagTitle: populatedTagDoc!.name, questions, hasMorePages };
+        return { tagTitle: tagDoc.name, questions };
     } catch (error) {
         console.error("Error occurred while fetching Questions", error);
         throw new Error("Error occurred while fetching Questions");

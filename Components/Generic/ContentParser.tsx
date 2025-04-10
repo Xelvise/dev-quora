@@ -55,7 +55,7 @@ export default function ContentParser({ content, display }: { content: string; d
     };
 
     return (
-        <div>
+        <>
             <div
                 ref={contentRef}
                 className={`markdown min-w-full ${display === "answer" && isClamped ? "line-clamp-5" : ""}`}
@@ -67,6 +67,6 @@ export default function ContentParser({ content, display }: { content: string; d
                     {isClamped ? "Read more" : "Read less"}
                 </button>
             )}
-        </div>
+        </>
     );
 }

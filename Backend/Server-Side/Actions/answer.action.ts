@@ -44,7 +44,7 @@ export async function createAnswer(params: CreateAnswerParams) {
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
     } catch (error) {
         console.log("Failed to create answer", error);
-        throw new Error("Failed to create answer");
+        throw error;
     } finally {
         // await mongoose.connection.close();
     }

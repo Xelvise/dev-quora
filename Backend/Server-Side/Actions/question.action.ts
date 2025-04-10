@@ -30,11 +30,11 @@ export async function fetchQuestions(params: GetQuestionsParams) {
     }
     if (filter === "unanswered") filterQuery.answers = { $size: 0 };
 
-    const pastQuestions = (page - 1) * pageSize;
+    const past_pages = (page - 1) * pageSize;
     try {
         await connectToDB();
         const questions_ = QuestionCollection.find<QuestionDoc>(filterQuery)
-            .skip(pastQuestions)
+            .skip(past_pages)
             .limit(pageSize)
             .populate({ path: "tags", model: TagCollection })
             .populate({ path: "author", model: UserCollection });
@@ -53,7 +53,7 @@ export async function fetchQuestions(params: GetQuestionsParams) {
             throw new Error("Invalid filter");
         }
         const totalQuestions = await QuestionCollection.countDocuments(filterQuery);
-        const hasMorePages = totalQuestions > pastQuestions + questions.length;
+        const hasMorePages = totalQuestions > past_pages + questions.length;
         console.log("Questions retrieved successfully", questions);
         return JSON.stringify({ questions, hasMorePages });
     } catch (error) {
@@ -74,7 +74,7 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
             { content: { $regex: new RegExp(searchQuery, "i") } },
         ];
     }
-    const pastQuestions = (page - 1) * pageSize;
+    const past_pages = (page - 1) * pageSize;
     // prettier-ignore
     const sortOptions = filter === "most_recent"
                             ? { createdAt: -1 }
@@ -93,27 +93,23 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
         } else if (filter === "most_answered") {
             await QuestionCollection.aggregate([{ $project: { numOfAnswers: { $size: "$answers" } } }]);
         }
-        const user_ = UserCollection.findOne<UserDoc>({ clerkId: clerk_id });
-        let userDoc = await user_;
+        const userDoc = await UserCollection.findOne<UserDoc>({ clerkId: clerk_id });
         if (!userDoc) throw new Error("User not found");
+
         const totalQuestions = userDoc.saved.length;
-
-        userDoc = await user_
-            .skip(pastQuestions)
+        const savedQuestions = await QuestionCollection.find({
+            _id: { $in: userDoc.saved }, // Only get questions that are in the user's saved array
+            ...filterQuery, // Apply any additional filters
+        })
+            .sort(sortOptions as any)
+            .skip(past_pages)
             .limit(pageSize)
-            .populate({
-                path: "saved",
-                model: QuestionCollection,
-                match: filterQuery,
-                populate: [
-                    { path: "tags", model: TagCollection },
-                    { path: "author", model: UserCollection },
-                ],
-                options: { sort: sortOptions },
-            });
-        const savedQuestions = userDoc?.saved as any as QuestionDoc[];
-        const hasMorePages = totalQuestions > pastQuestions + savedQuestions.length;
+            .populate([
+                { path: "tags", model: TagCollection },
+                { path: "author", model: UserCollection },
+            ]);
 
+        const hasMorePages = totalQuestions > past_pages + savedQuestions.length;
         return JSON.stringify({ questions: savedQuestions, hasMorePages });
     } catch (error) {
         console.log("Failed to retrieve saved questions", error);
@@ -352,18 +348,18 @@ export async function toggleSaveQuestion(params: SaveQuestionParams) {
 
 export async function fetchUserTopQuestions(params: GetUserStatsParams) {
     const { user_id, page = 1, pageSize = 10 } = params;
-    const pastQuestions = (page - 1) * pageSize;
+    const past_pages = (page - 1) * pageSize;
     try {
         await connectToDB();
         const questions = await QuestionCollection.find<QuestionDoc>({ author: user_id })
-            .skip(pastQuestions)
+            .skip(past_pages)
             .limit(pageSize)
             .populate({ path: "tags", model: TagCollection })
             .populate({ path: "author", model: UserCollection })
             .sort({ createdAt: -1, views: -1, upvotes: -1 });
 
         const totalQuestions = await QuestionCollection.countDocuments({ author: user_id });
-        const hasMorePages = totalQuestions > pastQuestions + questions.length;
+        const hasMorePages = totalQuestions > past_pages + questions.length;
 
         return JSON.stringify({ questions, hasMorePages });
     } catch (error) {

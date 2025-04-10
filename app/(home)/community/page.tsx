@@ -10,13 +10,13 @@ interface Props {
     searchParams: Promise<{
         q?: string;
         filter?: UserFilter;
-        page?: string;
     }>;
 }
 
 export default async function Community({ searchParams }: Props) {
-    const { q, filter, page } = await searchParams;
-    const { users, hasMorePages } = await fetchUsers({ searchQuery: q, filter, page: page ? +page : 1 });
+    const { q, filter } = await searchParams;
+    const { users } = await fetchUsers({ searchQuery: q, filter });
+
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7">
             <h1 className="h1-bold text-dark300_light900">All Users</h1>

@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Spinner } from "../Shadcn/spinner";
 import { useRouter } from "next/navigation";
 import { updateUser } from "@/Backend/Server-Side/Actions/user.action";
+import { useToast } from "@/Components/Shadcn/hooks/use-toast";
 
 interface Props {
     clerkId: string;
@@ -21,8 +22,9 @@ interface Props {
 }
 
 export default function ProfileUpdateForm({ clerkId, stringifiedProfileDetails }: Props) {
-    const profile = JSON.parse(stringifiedProfileDetails) as UserDoc;
+    const { toast } = useToast();
     const router = useRouter();
+    const profile = JSON.parse(stringifiedProfileDetails) as UserDoc;
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<z.infer<typeof UserProfileSchema>>({
@@ -49,14 +51,22 @@ export default function ProfileUpdateForm({ clerkId, stringifiedProfileDetails }
                     portfolioWebsite: data.portfolioWebsite,
                 },
                 pathToRefetch: [`/profile/${clerkId}`],
-                redirectToGivenPath: true,
             });
             router.back();
+            toast({
+                title: "Profile updated",
+                description: "Your profile has been updated successfully.",
+                variant: "default",
+                duration: 3000,
+            });
         } catch (error) {
             console.log("Profile could not be updated: ");
-            if (error instanceof Error) {
-                // TODO: Add a toast notification to inform the user about the error
-            }
+            toast({
+                title: "Profile could not be updated",
+                description: "Please try again later.",
+                variant: "destructive",
+                duration: 3000,
+            });
         } finally {
             setIsSubmitting(false);
         }

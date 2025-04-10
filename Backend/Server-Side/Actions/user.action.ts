@@ -11,14 +11,21 @@ import { redirect } from "next/navigation";
 import { BadgeCriteriaType } from "@/types";
 import { assignBadges } from "@/app/utils";
 
-export async function getSignedInUser(clerk_id: string | null) {
+export async function getSignedInUser(clerk_id: string | null, retryCount = 0) {
     try {
         await connectToDB();
         const user = await UserCollection.findOne<UserDoc>({ clerkId: clerk_id });
         return user;
     } catch (error) {
-        console.error("User could not be found", error);
-        throw new Error("User could not be found");
+        console.error(`User could not be found (attempt ${retryCount + 1}/3)`, error);
+
+        // Only retry twice (3 attempts total)
+        if (retryCount < 2) {
+            // Wait a bit before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, retryCount)));
+            return getSignedInUser(clerk_id, retryCount + 1);
+        }
+        throw error; // After max retries, throw the error
     }
 }
 
@@ -76,10 +83,9 @@ export async function fetchUsers(params: GetAllUsersParams) {
     }
     try {
         await connectToDB();
-        const users_ = UserCollection.find<UserDoc>(filterQuery).limit(page * pageSize); //.skip(past_pages).limit(pageSize);
-
-        const totalUsers = await UserCollection.countDocuments(filterQuery);
-        const hasMorePages = totalUsers > page * pageSize;
+        const users_ = UserCollection.find<UserDoc>(filterQuery);
+        // const totalUsers = await UserCollection.countDocuments(filterQuery);
+        // const hasMorePages = totalUsers > page * pageSize;
 
         let users;
         if (filter === "new_users") {
@@ -91,7 +97,7 @@ export async function fetchUsers(params: GetAllUsersParams) {
         } else {
             throw new Error("Invalid filter");
         }
-        return { users, hasMorePages };
+        return { users };
     } catch (error) {
         console.error("Error occured while fetching Users", error);
         throw new Error("Error occured while fetching Users");
@@ -109,14 +115,13 @@ export async function createUser(userData: CreateUserParams) {
 }
 
 export async function updateUser(params: UpdateUserParams) {
-    const { clerk_id, updatedData, pathToRefetch, redirectToGivenPath } = params;
+    const { clerk_id, updatedData, pathToRefetch } = params;
     try {
         await connectToDB();
         // prettier-ignore
         const updatedUser = await UserCollection.findOneAndUpdate<UserDoc>({ clerkId: clerk_id }, updatedData, { new: true });
         if (pathToRefetch) {
             pathToRefetch.forEach(path => revalidatePath(path));
-            if (redirectToGivenPath) redirect(pathToRefetch[0]);
         }
     } catch (error) {
         console.error("Error occured while updating User", error);

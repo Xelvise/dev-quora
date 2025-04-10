@@ -226,7 +226,7 @@ body {
 
     /* CARD & TAB STYLES */
     .tab {
-        @apply min-h-full bg-light-800 text-light-500 dark:bg-dark-400;
+        @apply min-h-full bg-light-800 text-orange-400 dark:bg-dark-400 dark:text-light-500;
     }
     .card-wrapper {
         --tw-bg-opacity: 1;

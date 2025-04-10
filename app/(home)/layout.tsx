@@ -1,6 +1,7 @@
 import LeftSidebar from "@/Components/Sidebar/LeftSidebar";
 import Navbar from "@/Components/Generic/Navbar";
 import RightSidebar from "@/Components/Sidebar/RightSidebar";
+import { Toaster } from "@/Components/Shadcn/toaster";
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -13,7 +14,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 </section>
                 <RightSidebar />
             </div>
-            {/* Toaster */}
+            <Toaster />
         </section>
     );
 }

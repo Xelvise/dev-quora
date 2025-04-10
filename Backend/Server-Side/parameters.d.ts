@@ -153,7 +153,6 @@ export interface UpdateUserParams {
     clerk_id: string;
     updatedData: Partial<UserDoc>;
     pathToRefetch?: string[];
-    redirectToGivenPath?: boolean;
 }
 
 export interface SaveQuestionParams {

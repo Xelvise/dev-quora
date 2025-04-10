@@ -3,9 +3,11 @@
 import { formatNumber } from "@/app/utils";
 import { downvoteAnswer, upvoteAnswer } from "@/Backend/Server-Side/Actions/answer.action";
 import { downvoteQuestion, toggleSaveQuestion, upvoteQuestion } from "@/Backend/Server-Side/Actions/question.action";
+import { useToast } from "@/Components/Shadcn/hooks/use-toast";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { ToastAction } from "../Shadcn/toast";
 
 interface Props {
     postType: "question" | "answer";
@@ -20,6 +22,8 @@ interface Props {
 
 // prettier-ignore
 export default function VoteSection({ postType, post_id, userId, upvotes, downvotes, hasUpvoted, hasDownvoted, hasSaved }: Props) {
+    const router = useRouter();
+    const { toast } = useToast();
     const pathname = usePathname();
 
     const [reclickOptions, setReclickState] = useState({ canUpvote: true, canDownvote: true, canSave: true });
@@ -30,7 +34,14 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
     const [hasSavedOptimistically, setSavedOptimistically] = useState(hasSaved)
 
     const handleVote = async (action: "upvote" | "downvote") => {
-        if (!userId) return console.log("Only logged-in Users can cast a vote"); // TODO: render a Toaster that instructs the User to sign in
+        if (!userId) {
+            return toast({
+                title: "Only logged-in Users can cast a vote",
+                variant: "destructive",
+                duration: 3000,
+                action: <ToastAction altText="Sign in" onClick={() => router.push("/sign-in")}>Sign In</ToastAction>,
+            });
+        }
 
         setReclickState({ ...reclickOptions, canUpvote: false, canDownvote: false });
         if (action === "upvote") {
@@ -106,7 +117,14 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
     };
     
     const toggleSave = async (hasSaved: boolean) => {
-        if (!userId) return console.log("Only logged-in Users can save a question or post"); // TODO: render a Toaster that instructs the User to sign in
+        if (!userId) {
+            return toast({
+                title: "Only logged-in Users can save a Question",
+                variant: "destructive",
+                duration: 3000,
+                action: <ToastAction altText="Sign in" onClick={() => router.push("/sign-in")}>Sign In</ToastAction>,
+            });
+        }
         setReclickState({...reclickOptions, canSave: false})
         setSavedOptimistically(!hasSavedOptimistically)
         try {

@@ -19,40 +19,33 @@ interface Props {
 export default async function SavedCollection({ searchParams }: Props) {
     const { q, filter } = await searchParams;
     const { userId: clerkId } = await auth();
-    if (!clerkId) return redirect("/sign-in"); // render a Toaster saying "You need to be logged in to view Saved questions"
+    if (!clerkId) return redirect("/sign-in");
     const user = await getSignedInUser(clerkId);
 
-    try {
-        const data = await fetchSavedQuestions({ clerk_id: clerkId, searchQuery: q, filter });
+    const data = await fetchSavedQuestions({ clerk_id: clerkId, searchQuery: q, filter });
 
-        return (
-            <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
-                <h1 className="h1-bold text-dark300_light900">Saved Questions</h1>
-                <div className="flex w-full gap-5 max-md:gap-3 max-sm:flex-col">
-                    <LocalSearchBar placeholder="Search your saved collections" assetIcon="search" />
-                    <div className="rounded-[7px]">
-                        <Filters type="menu-list" filterData={QuestionFilters} defaultFilterValue="most_recent" />
-                    </div>
+    return (
+        <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
+            <h1 className="h1-bold text-dark300_light900">Saved Questions</h1>
+            <div className="flex w-full gap-5 max-md:gap-3 max-sm:flex-col">
+                <LocalSearchBar placeholder="Search your saved collections" assetIcon="search" />
+                <div className="rounded-[7px]">
+                    <Filters type="menu-list" filterData={QuestionFilters} defaultFilterValue="most_recent" />
                 </div>
-
-                <PopulateQuestionCard
-                    serverAction="fetchSavedQuestions"
-                    clerk_id={clerkId}
-                    stringifiedInitialData={data}
-                    stringifiedSignedInUser={JSON.stringify(user)}
-                >
-                    <NoResults
-                        title="No Saved Questions Found"
-                        desc="It appears there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
-                        link="/"
-                        linkTitle="Explore Questions"
-                    />
-                </PopulateQuestionCard>
-            </main>
-        );
-    } catch (error) {
-        if (error instanceof Error && error.message === "Failed to retrieve saved questions") {
-            // TODO: Add a toast notification to inform the user about the error
-        }
-    }
+            </div>
+            <PopulateQuestionCard
+                serverAction="fetchSavedQuestions"
+                clerk_id={clerkId}
+                stringifiedInitialData={data}
+                stringifiedSignedInUser={JSON.stringify(user)}
+            >
+                <NoResults
+                    title="No Saved Questions Found"
+                    desc="It appears there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
+                    link="/"
+                    linkTitle="Explore Questions"
+                />
+            </PopulateQuestionCard>
+        </main>
+    );
 }

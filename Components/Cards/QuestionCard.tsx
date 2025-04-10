@@ -19,7 +19,7 @@ export default function QuestionCard({ question, signedInUser }: Props) {
     const totalVotes = upvotes.length + downvotes.length;
 
     return (
-        <div className="card-wrapper dark:card-wrapper-dark flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
+        <div className="shadow-effect flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
             <div className="flex w-full flex-col-reverse items-start gap-1">
                 <div className="flex flex-col gap-1">
                     <p className="subtle-regular text-dark200_light700 line-clamp-1 md:hidden">{`asked ${calcTimeDiff(new Date(createdAt))}`}</p>

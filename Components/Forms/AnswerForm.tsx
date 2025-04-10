@@ -16,6 +16,7 @@ import Image from "next/image";
 import { createAnswer } from "@/Backend/Server-Side/Actions/answer.action";
 import { usePathname } from "next/navigation";
 import { QuestionDoc } from "@/Backend/Database/question.collection";
+import { useToast } from "@/Components/Shadcn/hooks/use-toast";
 
 interface Props {
     signedInUserId: string | null;
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Props) {
+    const { toast } = useToast();
     const { mode } = useTheme();
     const pathname = usePathname();
     const question = JSON.parse(stringifiedQuestion) as QuestionDoc;
@@ -36,7 +38,13 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
     const [isGenerating, setGeneration] = useState(false);
 
     const onSubmitAnswer = async (data: z.infer<typeof AnswerSchema>) => {
-        if (!signedInUserId) throw new Error("Something went wrong. Kindly Sign-in to submit an answer");
+        if (!signedInUserId) {
+            return toast({
+                title: "Kindly sign in to submit an answer",
+                variant: "destructive",
+                duration: 5000,
+            });
+        }
         setSubmission(true);
         try {
             // Call a server action to submit an answer
@@ -47,18 +55,33 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                 pathToRefetch: pathname,
             });
             if (editorRef.current) (editorRef.current as any).setContent("");
+            toast({
+                title: "Answer submitted",
+                description: "Your answer has been submitted successfully.",
+                variant: "default",
+                duration: 5000,
+            });
         } catch (error) {
-            console.error("Answer could not be submitted");
-            if (error instanceof Error) {
-                // TODO: Add a toast notification to inform the user about the error
-            }
+            console.log("Answer could not be submitted", error);
+            toast({
+                title: "An error occurred while submitting your answer",
+                description: "Please try again.",
+                variant: "destructive",
+                duration: 5000,
+            });
         } finally {
             setSubmission(false);
         }
     };
 
     const generate_AI_answer = async () => {
-        if (!signedInUserId) return; //TODO: a Toaster ("Something went wrong. Kindly Sign-in to generate an answer");
+        if (!signedInUserId) {
+            return toast({
+                title: "Kindly sign in to use this feature.",
+                variant: "destructive",
+                duration: 5000,
+            });
+        }
         setGeneration(true);
         try {
             console.log("Generating AI answer...");
@@ -70,14 +93,28 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
             const data = await response.json();
             if (response.ok) {
                 if (editorRef.current) (editorRef.current as any).setContent(data.message.replace(/\n/g, "<br />"));
-                // TODO: Add a toast notification to inform user of successful AI answer generation
+                toast({
+                    title: "Gemini just generated you an answer",
+                    variant: "default",
+                    duration: 5000,
+                });
             } else {
                 console.log("Server error: ", data.error);
-                // TODO: a Toaster (data.error)
+                toast({
+                    title: "Gemini failed to generate an answer",
+                    description: "Please try again.",
+                    variant: "destructive",
+                    duration: 3000,
+                });
             }
         } catch (error: any) {
-            console.error("Network Error:", error.message);
-            // TODO: a Toaster ("AI answer generation failed. Please, try again");
+            console.error("Answer generation failed", error.message);
+            toast({
+                title: "Gemini failed to generate an answer",
+                description: "Please try again.",
+                variant: "destructive",
+                duration: 3000,
+            });
         } finally {
             setGeneration(false);
         }
@@ -90,7 +127,7 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                 <Button
                     type="button"
                     disabled={isGenerating}
-                    className="body-regular dark:solid-light-border flex w-fit gap-2 rounded-[7px] p-3 text-primary-500 dark:text-primary-300"
+                    className="body-regular dark:solid-light-border flex min-w-[200px] gap-2 rounded-[7px] p-3 text-primary-500 dark:text-primary-300"
                     onClick={generate_AI_answer}
                 >
                     {isGenerating ? (

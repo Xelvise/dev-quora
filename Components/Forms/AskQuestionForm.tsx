@@ -19,6 +19,7 @@ import { AskQuestionSchema } from "./FormSchemas";
 import { useTheme } from "@/app/GlobalContextProvider";
 import { QuestionDoc } from "@/Backend/Database/question.collection";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/Components/Shadcn/hooks/use-toast";
 
 interface Props {
     formType?: "update" | "create";
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export default function AskQuestionForm({ formType = "create", user_id, stringifiedPrevQuestion }: Props) {
+    const { toast } = useToast();
     const { mode } = useTheme(); // used to decide the theme of the editor
     const router = useRouter();
 
@@ -48,7 +50,13 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
         setIsSubmitting(true);
         // Call a server action to create a question
         try {
-            if (!user_id) throw new Error("Something went wrong. Kindly Sign-in");
+            if (!user_id) {
+                return toast({
+                    title: "Only signed-in users can create or modify a Question",
+                    variant: "destructive",
+                    duration: 3000,
+                });
+            }
             if (Object.keys(prevQuestion).length > 0) {
                 await updateQuestion({
                     question_id: prevQuestion._id,
@@ -58,6 +66,12 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                     pathToRefetch: "/",
                 });
                 router.back();
+                toast({
+                    title: "Your question has been modified",
+                    description: "Be rest assured you'll get an answer soonest",
+                    variant: "default",
+                    duration: 3000,
+                });
             } else {
                 await createQuestion({
                     title: data.title,
@@ -67,14 +81,20 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                     pathToRefetch: "/",
                 });
                 router.push("/");
+                toast({
+                    title: "Thanks for dropping a question",
+                    description: "Be rest assured you'll get an answer soonest",
+                    variant: "default",
+                    duration: 3000,
+                });
             }
-            // TODO: Add a toast notification to inform the user about successful submission
-            localStorage.removeItem("referrer");
         } catch (error) {
             console.error("Question could not be created: ", error);
-            if (error instanceof Error) {
-                // TODO: Add a toast notification to inform the user about the error
-            }
+            toast({
+                title: "Something went wrong. Kindly try again.",
+                variant: "destructive",
+                duration: 3000,
+            });
         } finally {
             setIsSubmitting(false);
         }
