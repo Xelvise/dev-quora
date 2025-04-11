@@ -1,10 +1,10 @@
 import { Schema, models, model, Document } from "mongoose";
-import { QuestionFormat } from "./question.collection";
 
 // "UserStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection
 
-interface UserStructure extends Document {
+export interface UserDoc extends Document {
+    _id: Schema.Types.ObjectId;
     clerkId: string;
     name: string;
     username: string;
@@ -14,16 +14,12 @@ interface UserStructure extends Document {
     picture: string;
     location?: string;
     portfolioWebsite?: string;
-    reputation?: number;
-    saved?: Schema.Types.ObjectId[];
-    joinedAt?: Date;
+    reputation: number;
+    saved: Schema.Types.ObjectId[];
+    joinedAt: Date;
 }
 
-export interface UserFormat extends Omit<UserStructure, "saved"> {
-    saved?: QuestionFormat[];
-}
-
-const UserSchema = new Schema<UserStructure>({
+const UserSchema = new Schema<UserDoc>({
     clerkId: { type: String, required: true },
     name: { type: String, required: true },
     username: { type: String, required: true, unique: true },
@@ -34,7 +30,7 @@ const UserSchema = new Schema<UserStructure>({
     location: { type: String },
     portfolioWebsite: { type: String },
     reputation: { type: Number, default: 0 },
-    saved: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Reference to questions saved by this user
+    saved: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Array of references to questions saved by this user
     joinedAt: { type: Date, default: Date.now },
 });
 

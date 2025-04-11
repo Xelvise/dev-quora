@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { BADGE_CRITERIA } from "@/Constants";
+import { BadgeCounts, BadgeCriteriaType } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -38,3 +40,62 @@ export function formatNumber(num: number) {
         return num.toString();
     }
 }
+
+export function parseDate(date: Date) {
+    // Extract the month and year from the Date object
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+
+    // Create the joined date string (e.g, "September 2023")
+    const joinedDate = `${month} ${year}`;
+    return joinedDate;
+}
+
+export function findFilterNameByValue(filterArray: { name: string; value: string }[], targetValue: string | undefined) {
+    if (!targetValue) return targetValue;
+    for (const filter of filterArray) {
+        if (filter.value === targetValue) {
+            return filter.name;
+        }
+    }
+    return targetValue;
+}
+
+export function areArraysEqual(arr1: string[], arr2: string[]) {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((item, index) => item === arr2[index]);
+}
+
+interface BadgeParam {
+    criteria: {
+        type: BadgeCriteriaType;
+        count: number;
+    }[];
+}
+
+export const assignBadges = (params: BadgeParam) => {
+    // Initialize the badgeCounts with zeroed-out values for GOLD, SILVER, and BRONZE
+    const badgeCounts: BadgeCounts = { GOLD: 0, SILVER: 0, BRONZE: 0 };
+
+    // Extract the 'criteria' array from the function parameters
+    const { criteria } = params;
+
+    // Loop through each item in 'criteria'
+    criteria.forEach(item => {
+        // Destructure 'type' and 'count' from the current item
+        const { type, count } = item;
+
+        // Retrieve the badge level thresholds from BADGE_CRITERIA using 'type'
+        const badgeLevels = BADGE_CRITERIA[type];
+
+        // Loop through each badge level (BRONZE, SILVER, GOLD)
+        Object.keys(badgeLevels).forEach(level => {
+            // If the user's badge 'count' meets or exceeds the threshold for this level...
+            if (count >= badgeLevels[level as keyof BadgeCounts]) {
+                // ...increment the corresponding badge count
+                badgeCounts[level as keyof BadgeCounts] += 1;
+            }
+        });
+    });
+    return badgeCounts;
+};

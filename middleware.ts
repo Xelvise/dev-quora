@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/ask-question(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/ask-question(.*)", "/profile/edit(.*)", "/collection(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
     // Checks if requested route is protected
@@ -10,14 +10,6 @@ export default clerkMiddleware(async (auth, req) => {
         // If Auth is successful, User is redirected back to requested route
     }
 });
-
-// ALTERNATIVELY,
-// export default clerkMiddleware(async (auth, req) => {
-//     const { userId, redirectToSignIn } = await auth();
-//     if (!userId && isProtectedRoute(req)) {
-//         return redirectToSignIn({returnBackUrl: req.url});
-//     }
-// });
 
 export const config = {
     matcher: [

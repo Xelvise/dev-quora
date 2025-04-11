@@ -81,17 +81,26 @@ body {
     .h1-bold {
         @apply text-[30px] font-bold leading-[42px] tracking-tighter;
     }
+    .h1-regular {
+        @apply text-[30px] font-normal leading-[42px] tracking-tighter;
+    }
     .h2-bold {
         @apply text-[24px] font-bold leading-[31.2px];
     }
     .h2-semibold {
         @apply text-[24px] font-semibold leading-[31.2px];
     }
+    .h3-regular {
+        @apply text-[20px] font-normal leading-[26px];
+    }
     .h3-bold {
         @apply text-[20px] font-bold leading-[26px];
     }
     .h3-semibold {
         @apply text-[20px] font-semibold leading-[24.8px];
+    }
+    .base-regular {
+        @apply text-[18px] font-normal leading-[25.2px];
     }
     .base-medium {
         @apply text-[18px] font-medium leading-[25.2px];
@@ -143,6 +152,12 @@ body {
     .light-border-2 {
         @apply border-light-700 dark:border-dark-200 !important;
     }
+    .solid-light-border {
+        @apply border border-light-800 dark:border-dark-300 !important;
+    }
+    .bottom-only-border {
+        @apply border-b-[1px] border-b-light-700 dark:border-b-dark-200;
+    }
     .no-focus {
         @apply focus:ring-transparent;
     }
@@ -158,6 +173,11 @@ body {
     }
     .shadow-light100_darknone {
         @apply shadow-light-100 dark:shadow-none;
+    }
+    .shadow-effect {
+        box-shadow:
+            0 12px 12px -8px rgba(34, 47, 62, 0.1),
+            0 0 30px 1px rgba(34, 47, 62, 0.1);
     }
 
     /* CUSTOM THEMING */
@@ -206,7 +226,7 @@ body {
 
     /* CARD & TAB STYLES */
     .tab {
-        @apply text-light-5 min-h-full bg-light-800 dark:bg-dark-400;
+        @apply min-h-full bg-light-800 text-orange-400 dark:bg-dark-400 dark:text-light-500;
     }
     .card-wrapper {
         --tw-bg-opacity: 1;
@@ -228,7 +248,10 @@ body {
 
     /* MARKDOWN STYLING */
     .markdown {
-        @apply dark:pros prose max-w-full dark:prose-p:text-light-700;
+        @apply max-w-full dark:prose dark:prose-p:text-light-700;
+    }
+    .markdown p {
+        @apply base-regular max-sm:paragraph-regular mt-5 dark:mt-5;
     }
     .markdown a {
         color: #1da1f2;

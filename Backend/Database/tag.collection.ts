@@ -1,28 +1,22 @@
 import { Schema, model, models, Document } from "mongoose";
-import { QuestionFormat } from "./question.collection";
-import { UserFormat } from "./user.collection";
 
 // "TagStructure" inherits properties from the Document class so as to align with MongoDB document schema
 // `Schema.Types.ObjectID` represents the unique identifier of a document in a MongoDB collection
 
-interface TagStructure extends Document {
+export interface TagDoc extends Document {
+    _id: Schema.Types.ObjectId;
     name: string;
-    desc: string;
+    desc?: string;
     questions: Schema.Types.ObjectId[];
     followers: Schema.Types.ObjectId[];
     createdOn: Date;
 }
 
-export interface TagFormat extends Omit<TagStructure, "questions" | "followers"> {
-    questions: QuestionFormat[];
-    followers: UserFormat[];
-}
-
-const TagSchema = new Schema<TagStructure>({
+const TagSchema = new Schema<TagDoc>({
     name: { type: String, required: true, unique: true },
-    desc: { type: String, required: true },
-    questions: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Reference to questions associated with this tag
-    followers: [{ type: Schema.Types.ObjectId, ref: "users" }], // Reference to Users whose questions are associated with this tag
+    desc: { type: String },
+    questions: [{ type: Schema.Types.ObjectId, ref: "questions" }], // Array of references to questions associated with this tag
+    followers: [{ type: Schema.Types.ObjectId, ref: "users" }], // Array of references to Users whose questions are associated with this tag
     createdOn: { type: Date, default: Date.now },
 });
 
