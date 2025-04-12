@@ -7,7 +7,6 @@ import { CreateUserParams, DeleteUserParams, GetAllUsersParams, UpdateUserParams
 import QuestionCollection from "@/Backend/Database/question.collection";
 import AnswerCollection from "@/Backend/Database/answer.collection";
 import { FilterQuery } from "mongoose";
-import { redirect } from "next/navigation";
 import { BadgeCriteriaType } from "@/types";
 import { assignBadges } from "@/app/utils";
 

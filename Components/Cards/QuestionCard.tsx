@@ -44,8 +44,8 @@ export default function QuestionCard({ question, signedInUser }: Props) {
             <div className="flex flex-wrap gap-2">
                 {questionTags.map(({ _id, name }) => (
                     <Tag
-                        key={String(_id).toString()}
-                        tag_id={String(_id).toString()}
+                        key={String(_id)}
+                        tag_id={String(_id)}
                         name={name}
                         badgeClassNames="uppercase small-regular rounded-[10px]"
                     />

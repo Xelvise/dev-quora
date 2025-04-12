@@ -1,5 +1,14 @@
-import NoResults from "@/Components/Generic/NoResults";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Jobs | DevQuora",
+    description:
+        "A community-driven platform for asking and answering programming questions. Get help, share knowledge and collaborate with developers around the world. Explore topics in Web development, mobile app development, algorithms, data structures and more.",
+    icons: {
+        icon: "/assets/images/site-logo.svg",
+    },
+};
 
 export default function Jobs() {
     return (

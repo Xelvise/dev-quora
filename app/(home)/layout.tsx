@@ -9,7 +9,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             <Navbar />
             <div className="flex">
                 <LeftSidebar />
-                <section className="flex flex-1 justify-center px-10 pb-10 pt-28 max-lg:px-6 max-sm:px-4 max-sm:pt-24">
+                <section className="flex flex-1 justify-center px-10 pb-10 pt-28 max-lg:px-7 max-sm:px-5 max-sm:pt-24">
                     {children}
                 </section>
                 <RightSidebar />

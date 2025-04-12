@@ -5,18 +5,18 @@ import Image from "next/image";
 import { Input } from "../Shadcn/input";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import GlobalSearchResultModal from "./SearchResultModal";
+import GlobalSearchResultModal from "./GlobalSearchResultModal";
 
 interface Props {
     placeholder?: string;
     removeIcon?: boolean;
     inputClassName?: string;
-    iconPosition?: "left" | "right";
     assetIcon?: string;
+    className?: string;
 }
 
 // prettier-ignore
-export function GlobalSearchBar({ placeholder, removeIcon, assetIcon, inputClassName="", iconPosition="left" }: Props) {
+export function GlobalSearchBar({ placeholder, removeIcon, assetIcon, inputClassName="", className="" }: Props) {
     const router = useRouter();
     const pathname = usePathname();
     const queryParams = useSearchParams();
@@ -64,13 +64,12 @@ export function GlobalSearchBar({ placeholder, removeIcon, assetIcon, inputClass
 
     return (
         <div
-            className="bg-light800_darkgradient flex h-[50px] max-w-[600px] grow items-center gap-1 rounded-[7px] px-4 max-lg:hidden xl:max-w-[800px]"
+            className={`bg-light800_darkgradient flex h-[50px] max-w-[600px] grow items-center gap-1 rounded-[7px] px-4 xl:max-w-[800px] ${className}`}
             ref={modal}
         >
             {removeIcon
                 ? null
-                : iconPosition === "left" &&
-                  assetIcon && (
+                : assetIcon && (
                       <Image
                           src={`/assets/icons/${assetIcon}.svg`}
                           alt="Icon"
@@ -86,23 +85,13 @@ export function GlobalSearchBar({ placeholder, removeIcon, assetIcon, inputClass
                 className={`paragraph-regular max-sm:body-regular no-focus placeholder text-dark400_light800 border-none shadow-none outline-none ${inputClassName}`}
                 onChange={event => {
                     setSearchValue(event.target.value);
-                    if (!isOpen) setOpenState(true);
+                    if (!isOpen && event.target.value.trim()) setOpenState(true);
                     if (event.target.value === "" && isOpen) setOpenState(false);
                 }}
             />
-            {removeIcon
-                ? null
-                : iconPosition === "right" &&
-                  assetIcon && (
-                      <Image
-                          src={`/assets/icons/${assetIcon}.svg`}
-                          alt="searchIcon"
-                          width={20}
-                          height={20}
-                          className="cursor-pointer"
-                      />
-                  )}
-            {isOpen && <GlobalSearchResultModal />}
+            {isOpen && (
+                <GlobalSearchResultModal className="absolute top-full z-10 mt-3 max-w-[570px] rounded-xl bg-light-800 py-5 shadow-sm dark:bg-dark-400 xl:max-w-[770px]" />
+            )}
         </div>
     );
 }

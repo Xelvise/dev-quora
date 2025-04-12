@@ -5,6 +5,16 @@ import Filters from "@/Components/Generic/Filters";
 import NoResults from "@/Components/Generic/NoResults";
 import { LocalSearchBar } from "@/Components/Generic/LocalSearchBar";
 import { UserFilters } from "@/Constants/filters";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Community | DevQuora",
+    description:
+        "A community-driven platform for asking and answering programming questions. Get help, share knowledge and collaborate with developers around the world. Explore topics in Web development, mobile app development, algorithms, data structures and more.",
+    icons: {
+        icon: "/assets/images/site-logo.svg",
+    },
+};
 
 interface Props {
     searchParams: Promise<{

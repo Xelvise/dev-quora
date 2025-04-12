@@ -55,3 +55,7 @@ next-env.d.ts
 # Redundant components
 Components/Shadcn/dropdown-menu*
 Components/Shadcn/menubar*
+
+# prettier
+.prettierignore
+prettier.config.js

@@ -25,13 +25,13 @@ export default function SearchResultFilters() {
 
     return (
         <div className="flex items-center justify-start gap-5">
-            <p className="text-dark200_light900 paragraph-regular px-5">Type:</p>
+            <p className="text-dark200_light900 paragraph-regular px-3">Type:</p>
 
             <div className="flex gap-3">
                 {GlobalSearchFilters.map(({ name, value }) => (
                     <Button
                         key={value}
-                        className={`light-border-2 small-medium rounded-2xl px-5 py-2 capitalize dark:text-light-800 dark:hover:text-primary-500 ${activeFilter === value ? "bg-primary-500 text-light-900" : "bg-light-700 text-dark-400 hover:text-primary-500 dark:bg-dark-500"}`}
+                        className={`light-border-2 small-medium rounded-2xl px-5 py-2 capitalize dark:text-light-800 ${activeFilter === value ? "bg-primary-500 text-light-900" : "bg-light-700 text-dark-400 dark:bg-dark-500 dark:hover:text-primary-500"}`}
                         onClick={() => handleTypeClick(value)}
                     >
                         {name}

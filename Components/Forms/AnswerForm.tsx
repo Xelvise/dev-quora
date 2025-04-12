@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -24,7 +23,7 @@ interface Props {
 }
 
 export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Props) {
-    const { toast } = useToast();
+    const { toast, dismiss } = useToast();
     const { mode } = useTheme();
     const pathname = usePathname();
     const question = JSON.parse(stringifiedQuestion) as QuestionDoc;
@@ -36,6 +35,13 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
     const editorRef = useRef<Editor | null>(null);
     const [isSubmitting, setSubmission] = useState(false);
     const [isGenerating, setGeneration] = useState(false);
+    const [editorContent, setEditorContent] = useState("");
+    const [thinkingToastId, setThinkingToastId] = useState<string | null>(null);
+
+    const handleEditorChange = (content: string) => {
+        setEditorContent(content);
+        form.setValue("answer", content);
+    };
 
     const onSubmitAnswer = async (data: z.infer<typeof AnswerSchema>) => {
         if (!signedInUserId) {
@@ -85,20 +91,31 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
         setGeneration(true);
         try {
             console.log("Generating AI answer...");
+            // Create toast and save its ID
+            const { id } = toast({
+                title: "Gemini is thinking...",
+                variant: "default",
+                duration: 5000,
+            });
+            setThinkingToastId(id);
+
             const response = await fetch(`${window.location.origin}/api/answer-generator`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ title: question.title, content: question.content }),
             });
             const data = await response.json();
+
+            // Dismiss the "thinking" toast, if it exists after the response is received, regardless of whether the response was successful or not
+            if (thinkingToastId) {
+                dismiss(thinkingToastId);
+                setThinkingToastId(null);
+            }
+
             if (response.ok) {
                 if (editorRef.current) (editorRef.current as any).setContent(data.message.replace(/\n/g, "<br />"));
-                toast({
-                    title: "Gemini just generated you an answer",
-                    variant: "default",
-                    duration: 5000,
-                });
             } else {
+                // handles unsuccessful responses like server errors
                 console.log("Server error: ", data.error);
                 toast({
                     title: "Gemini failed to generate an answer",
@@ -108,6 +125,11 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                 });
             }
         } catch (error: any) {
+            // handles client-side errors like network issues
+            if (thinkingToastId) {
+                dismiss(thinkingToastId);
+                setThinkingToastId(null);
+            }
             console.error("Answer generation failed", error.message);
             toast({
                 title: "Gemini failed to generate an answer",
@@ -158,12 +180,12 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                             <FormItem>
                                 <FormControl>
                                     <Editor
+                                        key={`${mode} theme`}
                                         apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
-                                        // @ts-ignore
-                                        onInit={(_, editor) => (editorRef.current = editor)}
-                                        initialValue=""
+                                        onInit={(_, editor) => (editorRef.current = editor as any)}
+                                        initialValue={editorContent}
                                         onBlur={field.onBlur}
-                                        onEditorChange={content => field.onChange(content)}
+                                        onEditorChange={handleEditorChange}
                                         init={{
                                             height: 500,
                                             menubar: false,
@@ -186,7 +208,13 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                         className="primary-gradient flex w-fit gap-2 self-center rounded-[7px] text-light-800"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? <><Spinner /> {"Submitting Answer"}</> : "Submit Answer"}
+                        {isSubmitting ? (
+                            <>
+                                <Spinner /> {"Submitting Answer"}
+                            </>
+                        ) : (
+                            "Submit Answer"
+                        )}
                     </Button>
                 </form>
             </Form>

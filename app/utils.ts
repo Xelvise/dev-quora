@@ -1,11 +1,5 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 import { BADGE_CRITERIA } from "@/Constants";
 import { BadgeCounts, BadgeCriteriaType } from "@/types";
-
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
 
 // prettier-ignore
 export function calcTimeDiff(inputDate: Date) {

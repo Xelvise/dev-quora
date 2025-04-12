@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -45,6 +44,13 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
     });
     const editorRef = useRef<Editor | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [editorContent, setEditorContent] = useState<string>(prevQuestion?.content || "");
+
+    // Store editor content when it changes so we can restore it after remounting
+    const handleEditorChange = (content: string) => {
+        setEditorContent(content);
+        form.setValue("explanation", content);
+    };
 
     const onSubmitForm = async (data: z.infer<typeof AskQuestionSchema>) => {
         setIsSubmitting(true);
@@ -172,12 +178,13 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                             </FormLabel>
                             <FormControl>
                                 <Editor
+                                    // Add a key that changes when theme changes to force remounting
+                                    key={`${mode} theme`}
                                     apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
-                                    // @ts-ignore
-                                    onInit={(_, editor) => (editorRef.current = editor)}
-                                    initialValue={prevQuestion?.content || ""}
+                                    onInit={(_, editor) => (editorRef.current = editor as any)}
+                                    initialValue={editorContent}
                                     onBlur={field.onBlur}
-                                    onEditorChange={content => field.onChange(content)}
+                                    onEditorChange={handleEditorChange}
                                     init={{
                                         height: 500,
                                         menubar: false,

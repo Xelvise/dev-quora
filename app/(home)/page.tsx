@@ -8,6 +8,16 @@ import { getSignedInUser } from "@/Backend/Server-Side/Actions/user.action";
 import { QuestionFilter } from "@/Backend/Server-Side/parameters";
 import PopulateQuestionCard from "@/Components/Populators/PopulateQuestionCard";
 import NoResults from "@/Components/Generic/NoResults";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Home | DevQuora",
+    description:
+        "A community-driven platform for asking and answering programming questions. Get help, share knowledge and collaborate with developers around the world. Explore topics in Web development, mobile app development, algorithms, data structures and more.",
+    icons: {
+        icon: "/assets/images/site-logo.svg",
+    },
+};
 
 interface Props {
     searchParams: Promise<{

@@ -26,8 +26,8 @@ export async function POST(payload: Request) {
             model: "gemini-2.0-flash",
             contents: content,
             config: {
-                systemInstruction: `${title} \n Do not apply any formatting to your response. Just provide your response in plain text.`,
-                maxOutputTokens: 200,
+                systemInstruction: `QUESTION: ${title} \n\n INSTRUCTION: Do not apply any formatting to your response and try limiting your response to 250 words.`,
+                maxOutputTokens: 300,
             },
         });
 

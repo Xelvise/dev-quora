@@ -2,13 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { Spinner } from "../Shadcn/spinner";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import SearchResultFilters from "./SearchResultFilters";
 import { fetchGlobalSearchResults, SearchResult } from "@/Backend/Server-Side/Actions/search.action";
 
-export default function GlobalSearchResultModal() {
+interface GlobalSearchResultModalProps {
+    className?: string;
+    onLinkClick?: (href: string) => void;
+}
+
+export default function GlobalSearchResultModal({ className = "", onLinkClick }: GlobalSearchResultModalProps) {
     const searchParams = useSearchParams();
     const globalQuery = searchParams.get("global") ?? undefined;
     const type = searchParams.get("type") ?? undefined;
@@ -50,11 +55,11 @@ export default function GlobalSearchResultModal() {
     };
 
     return (
-        <div className="absolute top-full z-10 mt-3 w-full max-w-[570px] rounded-xl bg-light-800 py-5 shadow-sm dark:bg-dark-400 xl:max-w-[770px]">
+        <div className={`w-full ${className}`}>
             <SearchResultFilters />
             <div className="my-5 h-[1px] bg-light-700/50 dark:bg-dark-500/50" />
 
-            <div className="flex flex-col space-y-5 px-4">
+            <div className="flex flex-col space-y-5 px-3">
                 <p className="text-dark200_light900 paragraph-semibold">Top Match</p>
 
                 {isLoading ? (
@@ -65,27 +70,31 @@ export default function GlobalSearchResultModal() {
                 ) : (
                     <div className="no-scrollbar flex max-h-[400px] flex-col overflow-y-scroll">
                         {result.length > 0 ? (
-                            result.map(({ id, title, type }) => (
-                                <Link
-                                    key={String(id)}
-                                    href={formatLink({ type, id })}
-                                    className="flex w-full cursor-pointer items-start gap-3 rounded-[10px] px-2.5 py-2.5 hover:bg-light-700/50 dark:hover:bg-dark-500/50"
-                                >
-                                    <Image
-                                        src="/assets/icons/tag.svg"
-                                        alt="tags"
-                                        width={18}
-                                        height={18}
-                                        className="invert-colors mt-1 object-contain"
-                                    />
-                                    <div className="flex flex-col">
-                                        <p className="text-dark400_light800 body-medium line-clamp-1">{title}</p>
-                                        <p className="text-light400_light500 small-medium mt-1 font-bold capitalize">
-                                            {type}
-                                        </p>
-                                    </div>
-                                </Link>
-                            ))
+                            result.map(({ id, title, type }) => {
+                                const href = formatLink({ type, id });
+                                return (
+                                    <Link
+                                        key={String(id)}
+                                        href={href}
+                                        onClick={onLinkClick ? () => onLinkClick(href) : undefined}
+                                        className="flex w-full cursor-pointer items-start gap-3 rounded-[10px] px-2.5 py-2.5 hover:bg-light-700/50 dark:hover:bg-dark-500/50"
+                                    >
+                                        <Image
+                                            src="/assets/icons/tag.svg"
+                                            alt="tags"
+                                            width={18}
+                                            height={18}
+                                            className="invert-colors mt-1 object-contain"
+                                        />
+                                        <div className="flex flex-col">
+                                            <p className="text-dark400_light800 body-medium line-clamp-1">{title}</p>
+                                            <p className="text-light400_light500 small-medium mt-1 font-bold capitalize">
+                                                {type}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                );
+                            })
                         ) : (
                             <div className="flex flex-col items-center justify-center">
                                 {/* <Image alt="emoji" src="" /> */}
