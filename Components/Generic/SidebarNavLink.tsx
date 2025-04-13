@@ -16,6 +16,7 @@ interface Props {
 const LinkContent = ({ route, imgURL, label, imgSize, isDesktopView, setOpenFn }: Props) => {
     const pathname = usePathname();
     const isSelected = pathname === route || pathname.includes(label.toLowerCase());
+
     return (
         <Link
             href={route}
@@ -31,19 +32,7 @@ const LinkContent = ({ route, imgURL, label, imgSize, isDesktopView, setOpenFn }
                 height={imgSize}
                 className={isSelected ? "" : "invert-colors"}
             />
-            <p
-                className={` ${isDesktopView && "max-lg:hidden"} ${
-                    isSelected
-                        ? isDesktopView
-                            ? "base-bold"
-                            : "paragraph-semibold"
-                        : isDesktopView
-                          ? "base-medium"
-                          : "paragraph-medium"
-                } `}
-            >
-                {label}
-            </p>
+            <p className={isDesktopView ? "base-medium max-lg:hidden" : "paragraph-medium"}>{label}</p>
         </Link>
     );
 };

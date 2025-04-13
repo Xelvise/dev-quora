@@ -44,7 +44,7 @@ export default function MobileSidebar() {
                                 imgURL={imgURL}
                                 route={route}
                                 label={label}
-                                imgSize={20}
+                                imgSize={16}
                                 setOpenFn={setOpen}
                             />
                         ))}
@@ -55,14 +55,14 @@ export default function MobileSidebar() {
                     <div className="flex flex-col items-center gap-3">
                         <SheetClose asChild>
                             <Link href="/sign-in">
-                                <Button className="base-medium min-h-[41px] w-fit rounded-[10px] px-16 py-4 shadow-none">
+                                <Button className="paragraph-medium min-h-[41px] w-fit rounded-[10px] p-5 shadow-none">
                                     <span className="primary-text-gradient">Log In</span>
                                 </Button>
                             </Link>
                         </SheetClose>
                         <SheetClose asChild>
                             <Link href="/sign-up">
-                                <Button className="base-medium solid-light-border btn-tertiary text-dark200_light900 min-h-[41px] w-fit rounded-[10px] px-16 py-4 shadow-none">
+                                <Button className="paragraph-medium solid-light-border btn-tertiary text-dark200_light900 min-h-[41px] w-fit rounded-[10px] p-5 shadow-none">
                                     Sign Up
                                 </Button>
                             </Link>

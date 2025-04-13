@@ -27,11 +27,15 @@ export default function NoResults({ title, desc, link, imgSrc, linkTitle }: Prop
                 height={200}
                 className="hidden object-contain dark:flex"
             />
-            <h1 className="text-dark200_light900 h2-bold text-center">{title}</h1>
-            {desc && <p className="text-dark100_light700 paragraph-medium max-w-md text-center">{desc}</p>}
+            <h1 className="text-dark200_light900 h3-bold max-sm:paragraph-semibold text-center">{title}</h1>
+            {desc && (
+                <p className="text-dark100_light700 paragraph-medium max-sm:body-regular max-w-md text-center">
+                    {desc}
+                </p>
+            )}
             {link && linkTitle && (
                 <Link href={link}>
-                    <Button className="primary-gradient flex items-center justify-center rounded-[10px] p-3 text-light-900">
+                    <Button className="primary-gradient max-sm:small-medium flex items-center justify-center rounded-[10px] p-3 text-light-900">
                         {linkTitle}
                     </Button>
                 </Link>
