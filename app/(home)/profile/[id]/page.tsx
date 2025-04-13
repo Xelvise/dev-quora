@@ -31,17 +31,17 @@ export default async function Profile({ params }: Props) {
     return (
         <main className="flex max-w-5xl flex-1 flex-col">
             <div className="flex items-start justify-between max-sm:flex-col-reverse">
-                <div className="flex items-start gap-4 max-md:flex-col">
+                <div className="flex items-start gap-4 max-md:flex-col max-sm:gap-2">
                     <Image
                         src={user.picture}
                         alt="picture"
-                        width={140}
-                        height={140}
+                        width={120}
+                        height={120}
                         className="rounded-full object-cover"
                     />
                     <div className="mt-3 flex flex-col">
-                        <p className="h2-bold text-dark500_light900">{user.name}</p>
-                        <p className="paragraph-regular text-dark400_light800">@{user.username}</p>
+                        <p className="h2-bold max-sm:base-semibold text-dark500_light900">{user.name}</p>
+                        <p className="paragraph-regular max-sm:body-regular text-dark400_light800">@{user.username}</p>
                         <div className="mt-3 flex flex-wrap gap-5 max-sm:flex-col max-sm:gap-2 sm:items-center">
                             {user.portfolioWebsite && (
                                 <ProfileLink
@@ -56,14 +56,18 @@ export default async function Profile({ params }: Props) {
                                 title={`Joined ${parseDate(user.joinedAt)}`}
                             />
                         </div>
-                        {user.bio && <p className="paragraph-regular text-dark200_light800 mt-5">{user.bio}</p>}
+                        {user.bio && (
+                            <p className="paragraph-regular max-sm:body-regular text-dark200_light800 mt-5">
+                                {user.bio}
+                            </p>
+                        )}
                     </div>
                 </div>
                 <div className="flex justify-end max-sm:w-full sm:mt-3">
                     <SignedIn>
                         {signedInUserId === user.clerkId && (
                             <Link href={"/profile/edit"}>
-                                <Button className="paragraph-medium btn-secondary text-dark300_light900 min-h-[46px] px-6 py-3">
+                                <Button className="paragraph-medium max-sm:body-medium btn-secondary text-dark300_light900 p-6 max-sm:p-4">
                                     Edit profile
                                 </Button>
                             </Link>

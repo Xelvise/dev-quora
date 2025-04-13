@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { Spinner } from "../Shadcn/spinner";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import SearchResultFilters from "./SearchResultFilters";
 import { fetchGlobalSearchResults, SearchResult } from "@/Backend/Server-Side/Actions/search.action";
 
-interface GlobalSearchResultModalProps {
+interface Props {
     className?: string;
     onLinkClick?: (href: string) => void;
+    scrolling_filters?: boolean;
 }
 
-export default function GlobalSearchResultModal({ className = "", onLinkClick }: GlobalSearchResultModalProps) {
+export default function GlobalSearchResultModal({ className = "", scrolling_filters, onLinkClick }: Props) {
     const searchParams = useSearchParams();
     const globalQuery = searchParams.get("global") ?? undefined;
     const type = searchParams.get("type") ?? undefined;
@@ -56,7 +57,7 @@ export default function GlobalSearchResultModal({ className = "", onLinkClick }:
 
     return (
         <div className={`w-full ${className}`}>
-            <SearchResultFilters />
+            <SearchResultFilters className={scrolling_filters ? "no-scrollbar overflow-x-auto" : ""} />
             <div className="my-5 h-[1px] bg-light-700/50 dark:bg-dark-500/50" />
 
             <div className="flex flex-col space-y-5 px-3">
@@ -68,7 +69,7 @@ export default function GlobalSearchResultModal({ className = "", onLinkClick }:
                         <p className="text-dark400_light800 body-regular">Browsing the entire database</p>
                     </div>
                 ) : (
-                    <div className="no-scrollbar flex max-h-[400px] flex-col overflow-y-scroll">
+                    <div className="no-scrollbar flex max-h-[500px] flex-col overflow-y-auto">
                         {result.length > 0 ? (
                             result.map(({ id, title, type }) => {
                                 const href = formatLink({ type, id });
@@ -96,9 +97,11 @@ export default function GlobalSearchResultModal({ className = "", onLinkClick }:
                                 );
                             })
                         ) : (
-                            <div className="flex flex-col items-center justify-center">
+                            <div className="mt-10 flex flex-col items-center justify-center">
                                 {/* <Image alt="emoji" src="" /> */}
-                                <p className="text-dark400_light800 body-regular py-2.5">Oops, no results found</p>
+                                <p className="text-dark400_light800 body-regular py-2.5">
+                                    Oops 🙁, there were no results found
+                                </p>
                             </div>
                         )}
                     </div>

@@ -48,7 +48,7 @@ export default function Navbar() {
 
                 <MobileSearchModal />
 
-                <div className="flex-between gap-10">
+                <div className="flex-between gap-7">
                     <ThemeSwitch />
                     <MobileSidebar />
                 </div>

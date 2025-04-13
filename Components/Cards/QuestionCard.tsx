@@ -24,7 +24,9 @@ export default function QuestionCard({ question, signedInUser }: Props) {
                 <div className="flex flex-col gap-1">
                     <p className="subtle-regular text-dark200_light700 line-clamp-1 md:hidden">{`asked ${calcTimeDiff(new Date(createdAt))}`}</p>
                     <Link href={`/question/${String(_id)}`}>
-                        <p className="h3-semibold max-sm:base-regular text-dark400_light900 line-clamp-1">{title}</p>
+                        <p className="base-regular max-sm:paragraph-regular text-dark400_light900 line-clamp-1">
+                            {title}
+                        </p>
                     </Link>
                 </div>
                 <div className="flex items-center gap-3 self-end">
@@ -47,7 +49,7 @@ export default function QuestionCard({ question, signedInUser }: Props) {
                         key={String(_id)}
                         tag_id={String(_id)}
                         name={name}
-                        badgeClassNames="uppercase small-regular rounded-[10px]"
+                        badgeClassNames="uppercase small-regular max-sm:subtle-regular rounded-[10px]"
                     />
                 ))}
             </div>
@@ -61,7 +63,7 @@ export default function QuestionCard({ question, signedInUser }: Props) {
                     href={`/profile/${questionAuthor.clerkId}`}
                     isAuthor
                 />
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <Metric
                         imgPath="/assets/icons/like.svg"
                         metricValue={formatNumber(totalVotes)}

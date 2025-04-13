@@ -12,7 +12,7 @@ interface Props {
 
 export default function NoResults({ title, desc, link, imgSrc, linkTitle }: Props) {
     return (
-        <div className="mt-10 flex w-full flex-col items-center justify-center gap-4">
+        <div className="mt-5 flex w-full flex-col items-center justify-center gap-4">
             <Image
                 src={imgSrc ? imgSrc : "/assets/images/light-illustration.png"}
                 alt="light illustration"

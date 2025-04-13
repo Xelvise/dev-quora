@@ -10,7 +10,7 @@ export default async function AskQuestion() {
 
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col">
-            <p className="h1-bold text-dark500_light900 mb-8">Ask a Question</p>
+            <p className="h1-bold max-sm:h3-bold text-dark500_light900 mb-8">Ask a Question</p>
             <AskQuestionForm user_id={user?.id} />
         </main>
     );

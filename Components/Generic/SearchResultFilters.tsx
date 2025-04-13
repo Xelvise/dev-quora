@@ -5,7 +5,7 @@ import { Button } from "../Shadcn/button";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SearchResultFilters() {
+export default function SearchResultFilters({ className = "" }: { className?: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const searchFilter = searchParams.get("type");
@@ -24,8 +24,8 @@ export default function SearchResultFilters() {
     };
 
     return (
-        <div className="flex items-center justify-start gap-5">
-            <p className="text-dark200_light900 paragraph-regular px-3">Type:</p>
+        <div className={"flex items-center justify-start gap-5 " + className}>
+            <p className="text-dark200_light900 paragraph-regular ml-2 sm:px-3">Type:</p>
 
             <div className="flex gap-3">
                 {GlobalSearchFilters.map(({ name, value }) => (

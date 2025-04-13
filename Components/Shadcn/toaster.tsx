@@ -20,7 +20,7 @@ export function Toaster() {
                     <Toast
                         key={id}
                         {...props}
-                        className={`shadow-effect rounded-[7px] border-none ${variant === "destructive" ? "bg-red-700 text-white" : "text-dark500_light900 bg-light850_dark500"}`}
+                        className={`shadow-effect rounded-[7px] border-none ${variant === "destructive" ? "bg-red-700 text-white" : "text-dark500_light900 bg-light800_dark300"}`}
                     >
                         <div className="grid gap-1">
                             {title && <ToastTitle>{title}</ToastTitle>}

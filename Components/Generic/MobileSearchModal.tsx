@@ -30,7 +30,6 @@ export default function MobileSearchModal() {
 
     // Ref to track the search bar container and search results container
     const modal = useRef<HTMLDivElement>(null);
-    const searchResultsRef = useRef<HTMLDivElement>(null);
     // State to manage the modal open/close state
     const [isOpen, setOpenState] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -40,11 +39,7 @@ export default function MobileSearchModal() {
         const handleOutsideClick = (event: MouseEvent) => {
             const target = event.target as Node;
             // Check if the click is outside both the modal and the search results container
-            if (
-                modal.current &&
-                !modal.current.contains(target) &&
-                !(searchResultsRef.current && searchResultsRef.current.contains(target))
-            ) {
+            if (modal.current && !modal.current.contains(target)) {
                 setOpenState(false); // Close the modal
             }
         };
@@ -80,18 +75,15 @@ export default function MobileSearchModal() {
     return (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-light800_dark300 max-w-[200px] grow gap-4 rounded-[10px] p-3">
+                <Button className="bg-light800_dark300 max-w-[150px] grow gap-2 rounded-[10px] p-3">
                     <Image src="/assets/icons/search.svg" alt="searchIcon" width={18} height={18} />
-                    <span className="body-regular text-light400_light500">Search globally</span>
+                    <span className="small-regular text-light400_light500">Search globally</span>
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="border-none bg-white focus:outline-none dark:bg-dark-300">
+            <DialogContent className="border-none bg-white focus:outline-none dark:bg-dark-300" ref={modal}>
                 <DialogTitle className="hidden">Mobile Search Modal</DialogTitle>
-                <div
-                    className="mt-8 flex h-[50px] w-full grow items-center gap-1 rounded-[7px] bg-light-800 px-5 dark:bg-dark-500"
-                    ref={modal}
-                >
+                <div className="mb-5 mt-20 flex h-[50px] w-full grow items-center gap-1 rounded-[7px] bg-light-800 px-5 dark:bg-dark-500">
                     <Image
                         src={`/assets/icons/search.svg`}
                         alt="Icon"
@@ -112,12 +104,7 @@ export default function MobileSearchModal() {
                         onMouseDown={handleEnterKeyPress}
                     />
                 </div>
-                {isOpen && (
-                    <div ref={searchResultsRef}>
-                        <GlobalSearchResultModal className="mt-2" onLinkClick={handleLinkClick} />
-                    </div>
-                )}
-                <div className="mb-5" />
+                {isOpen && <GlobalSearchResultModal className="mt-2" onLinkClick={handleLinkClick} scrolling_filters />}
             </DialogContent>
         </Dialog>
     );

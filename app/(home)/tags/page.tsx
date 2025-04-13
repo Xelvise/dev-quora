@@ -30,7 +30,7 @@ export default async function Tags({ searchParams }: Props) {
 
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7">
-            <h1 className="h1-bold text-dark300_light900">Tags</h1>
+            <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">Tags</h1>
 
             <div className="flex w-full gap-5 max-md:gap-3 max-sm:flex-col">
                 <LocalSearchBar placeholder="Search by tag name" assetIcon="search" />

@@ -145,11 +145,11 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
     return (
         <>
             <div className="mt-16 flex w-full flex-wrap items-center justify-between gap-5">
-                <p className="base-semibold max-sm:paragraph-semibold text-dark200_light800">Suggest an answer</p>
+                <p className="base-semibold max-sm:body-semibold text-dark200_light800">Suggest an answer</p>
                 <Button
                     type="button"
                     disabled={isGenerating}
-                    className="body-regular dark:solid-light-border flex min-w-[200px] gap-2 rounded-[7px] p-3 text-primary-500 dark:text-primary-300"
+                    className="body-regular dark:solid-light-border flex w-fit gap-2 rounded-[7px] p-5 text-primary-500 dark:text-primary-300"
                     onClick={generate_AI_answer}
                 >
                     {isGenerating ? (
@@ -165,7 +165,7 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                                 height={12}
                                 className="object-contain"
                             />
-                            Generate an AI answer
+                            Ask Gemini
                         </>
                     )}
                 </Button>

@@ -26,7 +26,7 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
     const { toast } = useToast();
     const pathname = usePathname();
 
-    const [reclickOptions, setReclickState] = useState({ canUpvote: true, canDownvote: true, canSave: true });
+    const [reclickState, setReclickState] = useState({ canUpvote: true, canDownvote: true, canSave: true });
     const [optimisticUpvotes, setOptimisticUpvotes] = useState(upvotes);
     const [optimisticDownvotes, setOptimisticDownvotes] = useState(downvotes);
     const [hasUpvotedOptimistically, setUpvotedOptimistically] = useState(hasUpvoted);
@@ -43,7 +43,7 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
             });
         }
 
-        setReclickState({ ...reclickOptions, canUpvote: false, canDownvote: false });
+        setReclickState(prev => ({ ...prev, canUpvote: false, canDownvote: false }));
         if (action === "upvote") {
             setUpvotedOptimistically(!hasUpvotedOptimistically);
             setOptimisticUpvotes(hasUpvotedOptimistically ? optimisticUpvotes - 1 : optimisticUpvotes + 1);
@@ -69,14 +69,14 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                         pathToRefetch: pathname,
                     });
                 }
-                console.log("Request was successful"); // TODO: render a toaster that says "Upvoted successfully"
+                console.log("Request was successful");
             } catch (error) {
                 setUpvotedOptimistically(hasUpvoted);
                 setDownvotedOptimistically(hasDownvoted);
                 setOptimisticUpvotes(upvotes);
                 setOptimisticDownvotes(downvotes);
             } finally {
-                setReclickState({ ...reclickOptions, canUpvote: true });
+                setReclickState(prev => ({ ...prev, canUpvote: true }));
             }
 
         } else if (action === "downvote") {
@@ -104,14 +104,14 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                         pathToRefetch: pathname,
                     });
                 }
-                console.log("Request was successful"); // TODO: render a toaster that says "Downvoted successfully"
+                console.log("Request was successful");
             } catch (error) {
                 setDownvotedOptimistically(hasDownvoted);
                 setUpvotedOptimistically(hasUpvoted);
                 setOptimisticDownvotes(downvotes);
                 setOptimisticUpvotes(upvotes);
             } finally {
-                setReclickState({ ...reclickOptions, canDownvote: true });
+                setReclickState(prev => ({ ...prev, canDownvote: true }));
             }
         };
     };
@@ -125,7 +125,7 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                 action: <ToastAction altText="Sign in" onClick={() => router.push("/sign-in")}>Sign In</ToastAction>,
             });
         }
-        setReclickState({...reclickOptions, canSave: false})
+        setReclickState(prev => ({ ...prev, canSave: false }))
         setSavedOptimistically(!hasSavedOptimistically)
         try {
             await toggleSaveQuestion({
@@ -134,16 +134,24 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                 user_id: userId,
                 pathToRefetch: pathname,
             });
-            console.log("Question was saved successfully"); // TODO: render a toaster that says "Saved successfully"
+            console.log("Question was saved successfully");
+            toast({
+                title: hasSaved
+                    ? "We've removed this question from your collection"
+                    : "We've added this question to your collection",
+                variant: "default",
+                duration: 3000,
+            });
+            
         } catch (error) {
             setSavedOptimistically(hasSaved);
         } finally {
-            setReclickState({ ...reclickOptions, canSave: true });
+            setReclickState(prev => ({ ...prev, canSave: true }));
         }
     };
     
     return (
-        <div className="flex gap-3">
+        <div className="flex gap-2">
             <div className="flex items-center justify-center gap-2">
                 <div className="flex items-center justify-center gap-1">
                     <Image
@@ -151,10 +159,10 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                         width={18}
                         height={18}
                         alt="upvote"
-                        className={reclickOptions.canUpvote ? "cursor-pointer" : "cursor-not-allowed"}
-                        onClick={reclickOptions.canUpvote ? () => handleVote("upvote") : undefined}
+                        className={`max-sm:h-[15px] max-sm:w-[15px] ${reclickState.canUpvote ? "cursor-pointer" : "cursor-not-allowed"}`}
+                        onClick={reclickState.canUpvote ? () => handleVote("upvote") : undefined}
                     />
-                    <div className="bg-light700_dark200 flex min-w-[18px] items-center justify-center rounded-sm p-1">
+                    <div className="bg-light700_dark200 flex min-w-[15px] items-center justify-center rounded-sm p-0.5">
                         <p className="subtle-medium text-dark200_light900">{formatNumber(optimisticUpvotes)}</p>
                     </div>
                 </div>
@@ -164,10 +172,10 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                         width={18}
                         height={18}
                         alt="downvote"
-                        className={reclickOptions.canDownvote ? "cursor-pointer" : "cursor-not-allowed"}
-                        onClick={reclickOptions.canDownvote ? () => handleVote("downvote") : undefined}
+                        className={`max-sm:h-[15px] max-sm:w-[15px] ${reclickState.canDownvote ? "cursor-pointer" : "cursor-not-allowed"}`}
+                        onClick={reclickState.canDownvote ? () => handleVote("downvote") : undefined}
                     />
-                    <div className="bg-light700_dark200 flex min-w-[18px] items-center justify-center rounded-sm p-1">
+                    <div className="bg-light700_dark200 flex min-w-[15px] items-center justify-center rounded-sm p-0.5">
                         <p className="subtle-medium text-dark200_light900">{formatNumber(optimisticDownvotes)}</p>
                     </div>
                 </div>
@@ -179,8 +187,8 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                     width={18}
                     height={18}
                     alt="star"
-                    className={reclickOptions.canSave ? "cursor-pointer" : "cursor-not-allowed"}
-                    onClick={reclickOptions.canSave ? () => toggleSave(hasSaved) : undefined}
+                    className={`max-sm:h-[15px] max-sm:w-[15px] ${reclickState.canSave ? "cursor-pointer" : "cursor-not-allowed"}`}
+                    onClick={reclickState.canSave ? () => toggleSave(hasSaved) : undefined}
                 />
             )}
         </div>

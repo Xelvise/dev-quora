@@ -10,7 +10,7 @@ export default async function EditProfilePage() {
 
     return (
         <div className="flex max-w-5xl flex-1 flex-col gap-9">
-            <p className="h1-bold text-dark500_light900">Edit Profile</p>
+            <p className="h1-bold max-sm:h3-bold text-dark500_light900">Edit Profile</p>
             <ProfileUpdateForm clerkId={clerkId} stringifiedProfileDetails={JSON.stringify(profile)} />
         </div>
     );

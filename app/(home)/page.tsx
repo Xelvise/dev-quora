@@ -36,10 +36,10 @@ export default async function Homepage({ searchParams }: Props) {
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
             <div className="flex flex-col-reverse">
-                <h1 className="h1-bold text-dark300_light900">All Questions</h1>
+                <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">All Questions</h1>
                 <Link
                     href="/ask-question"
-                    className="primary-gradient paragraph-semibold max-sm:body-medium flex self-end rounded-[7px] p-3 text-light-900 max-sm:p-2"
+                    className="primary-gradient paragraph-semibold max-sm:small-medium flex self-end rounded-[7px] p-3 text-light-900 max-sm:p-2"
                 >
                     Ask a Question
                 </Link>

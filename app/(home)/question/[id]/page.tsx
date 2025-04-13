@@ -48,7 +48,7 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
             <QuestionViewCounter question_id={id} user_id={signedInUser?.id} clientIP={ip} />
 
             <div className="flex w-full justify-between gap-5 max-sm:flex-col-reverse max-sm:gap-1 sm:items-center">
-                <Link href={`/profile/${questionAuthor.clerkId}`} className="flex justify-start gap-2">
+                <Link href={`/profile/${questionAuthor.clerkId}`} className="flex items-center justify-start gap-2">
                     <Image
                         src={questionAuthor.picture}
                         alt="profile-pic"
@@ -56,9 +56,11 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
                         width={25}
                         height={25}
                     />
-                    <p className="paragraph-semibold text-dark300_light700">{questionAuthor.name}</p>
+                    <p className="paragraph-semibold max-sm:body-semibold text-dark300_light700">
+                        {questionAuthor.name}
+                    </p>
                 </Link>
-                <div className="flex items-center justify-end gap-3">
+                <div className="flex items-center justify-end gap-3 max-sm:gap-2">
                     <VoteSection
                         postType="question"
                         post_id={question.id}
@@ -73,7 +75,7 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
                 </div>
             </div>
 
-            <h2 className="h2-semibold max-sm:h3-semibold text-dark400_light900 mt-3.5 w-full text-left">
+            <h2 className="h3-regular max-sm:paragraph-regular text-dark400_light900 mt-3.5 w-full text-left">
                 {question.title}
             </h2>
 

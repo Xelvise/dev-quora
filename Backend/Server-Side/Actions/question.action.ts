@@ -420,8 +420,19 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
         await QuestionCollection.deleteOne({ _id: question_id });
         await AnswerCollection.deleteMany({ question: question_id });
         await InteractionCollection.deleteMany({ question: question_id });
-        await TagCollection.updateMany({ questions: question_id }, { $pull: { questions: question_id } });
 
+        // Next, delete all tags associated with this question
+        // Step 1: Find tags whose questions' array contain this question
+        const questionTags = await TagCollection.find<TagDoc>({ questions: question_id });
+        // Step 2: For as many tags that contains question_id in its questions array, remove the question_id
+        await TagCollection.updateMany({ questions: question_id }, { $pull: { questions: question_id } });
+        // Step 3: Delete tags that now have empty questions arrays
+        for (const tagDoc of questionTags) {
+            // delete all tagDocs with questions length of 0
+            if (tagDoc.questions.length === 0) {
+                await TagCollection.findByIdAndDelete(tagDoc._id);
+            }
+        }
         if (pathToRefetch) revalidatePath(pathToRefetch);
     } catch (error) {
         console.log("Failed to delete question", error);

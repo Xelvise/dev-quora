@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function Jobs() {
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
-            <h1 className="h1-bold text-dark300_light900">Find Jobs</h1>
+            <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">Find Jobs</h1>
 
             <section className="card-wrapper dark:card-wrapper-dark flex flex-col items-center justify-center rounded-lg p-10">
                 <div className="flex max-w-md flex-col items-center gap-5 text-center">

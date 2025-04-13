@@ -10,18 +10,28 @@ interface Props {
 }
 
 export default function UserStats({ totalAnswers, totalQuestions, badgeCounts, reputation }: Props) {
+    const questionCount = formatNumber(totalQuestions);
+    const answerCount = formatNumber(totalAnswers);
+    const reputationLevel = formatNumber(reputation);
+
     return (
-        <div className="mt-14">
-            <p className="base-semibold text-dark400_light900 mb-3">Reputation Level: {reputation}</p>
+        <div className="mt-14 max-sm:mt-10">
+            <p className="base-semibold text-dark400_light900 max-sm:paragraph-semibold mb-3">
+                ⭐ {reputationLevel} Reward points
+            </p>
             <div className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-4">
                 <div className="light-border bg-light900_dark300 flex flex-wrap items-center gap-4 rounded-md border p-6 shadow-light-300 dark:shadow-dark-200">
                     <div>
-                        <p className="paragraph-semibold text-dark200_light900">{formatNumber(totalQuestions)}</p>
-                        <p className="body-medium text-dark200_light700">Questions</p>
+                        <p className="paragraph-semibold text-dark200_light900">{questionCount}</p>
+                        <p className="body-medium text-dark200_light700">
+                            {questionCount === "1" ? "Question" : "Questions"}
+                        </p>
                     </div>
                     <div>
-                        <p className="paragraph-semibold text-dark200_light900">{formatNumber(totalAnswers)}</p>
-                        <p className="body-medium text-dark200_light700">Answers</p>
+                        <p className="paragraph-semibold text-dark200_light900">{answerCount}</p>
+                        <p className="body-medium text-dark200_light700">
+                            {answerCount === "1" ? "Answer" : "Answers"}
+                        </p>
                     </div>
                 </div>
 

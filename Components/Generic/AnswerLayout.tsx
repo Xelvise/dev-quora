@@ -38,7 +38,7 @@ export default function AnswerLayout({ stringifiedData, question_id, stringified
                             key={String(_id)}
                             name={name}
                             tag_id={String(_id)}
-                            badgeClassNames="uppercase small-regular"
+                            badgeClassNames="uppercase small-regular max-sm:subtle-regular"
                         />
                     ))}
                 </div>

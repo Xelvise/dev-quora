@@ -19,9 +19,10 @@ export default async function TagDetails({ params, searchParams }: Props) {
 
     try {
         const { tagTitle, questions } = await fetchAllQuestionsByTagID({ tag_id: id, searchQuery: q });
+        console.log({ questions });
         return (
             <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
-                <h1 className="h1-bold text-dark300_light900">{tagTitle}</h1>
+                <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">{tagTitle}</h1>
 
                 <div className="flex w-full">
                     <LocalSearchBar placeholder={`Search questions associated with ${tagTitle}`} assetIcon="search" />
