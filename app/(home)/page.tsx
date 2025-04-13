@@ -59,7 +59,7 @@ export default async function Homepage({ searchParams }: Props) {
                 stringifiedSignedInUser={JSON.stringify(user)}
             >
                 <NoResults
-                    title="There's no question to show"
+                    title="There are no questions to show"
                     desc="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. Our query could be the next big thing others learn from. Get Involved! 💡"
                     link="/ask-question"
                     linkTitle="Ask a Question"

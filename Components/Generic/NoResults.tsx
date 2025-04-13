@@ -5,27 +5,26 @@ import Link from "next/link";
 interface Props {
     title: string;
     desc?: string;
-    imgSrc?: string;
     link?: string;
     linkTitle?: string;
 }
 
-export default function NoResults({ title, desc, link, imgSrc, linkTitle }: Props) {
+export default function NoResults({ title, desc, link, linkTitle }: Props) {
     return (
         <div className="mt-5 flex w-full flex-col items-center justify-center gap-4">
             <Image
-                src={imgSrc ? imgSrc : "/assets/images/light-illustration.png"}
+                src="/assets/images/light-illustration.png"
                 alt="light illustration"
                 width={270}
                 height={200}
-                className="block object-contain dark:hidden"
+                className="block object-contain dark:hidden max-sm:h-[150px] max-sm:w-[220px]"
             />
             <Image
-                src={imgSrc ? imgSrc : "/assets/images/dark-illustration.png"}
+                src="/assets/images/dark-illustration.png"
                 alt="dark illustration"
                 width={270}
                 height={200}
-                className="hidden object-contain dark:flex"
+                className="hidden object-contain dark:block max-sm:h-[150px] max-sm:w-[220px]"
             />
             <h1 className="text-dark200_light900 h3-bold max-sm:paragraph-semibold text-center">{title}</h1>
             {desc && (
