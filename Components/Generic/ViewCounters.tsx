@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { viewQuestion } from "@/Backend/Server-Side/Actions/interaction.action";
@@ -20,7 +21,7 @@ export function QuestionViewCounter({ question_id, user_id, clientIP }: Question
     const pathname = usePathname();
     useEffect(() => {
         (async () => await viewQuestion({ question_id, user_id, clientIP, pathToRefetch: pathname }))(); // immediately-invoked function expression
-    }, [question_id, user_id, clientIP, pathname]);
+    }, [question_id]);
     return null;
 }
 

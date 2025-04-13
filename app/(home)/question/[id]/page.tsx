@@ -99,7 +99,7 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
                 />
             </div>
 
-            <ContentParser content={question.content} display="question" />
+            <ContentParser content={question.content} />
 
             <AnswerLayout
                 stringifiedData={data}

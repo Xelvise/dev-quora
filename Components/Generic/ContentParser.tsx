@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import Prism from "prismjs";
 import parse from "html-react-parser";
 
@@ -27,46 +27,11 @@ import "prismjs/components/prism-mongodb";
 import "prismjs/plugins/line-numbers/prism-line-numbers.js";
 import "prismjs/plugins/line-numbers/prism-line-numbers.css";
 
-export default function ContentParser({ content, display }: { content: string; display: "question" | "answer" }) {
-    // When display is for an answer, we want to allow toggling between clamped & full view.
-    const [isClamped, setIsClamped] = useState(true);
-    // This state shows if the content overflows and if we need to show the toggle button.
-    const [showToggle, setShowToggle] = useState(false);
-    // Create a ref to the content container.
-    const contentRef = useRef<HTMLDivElement>(null);
-
+export default function ContentParser({ content }: { content: string }) {
     // Apply Prism syntax highlighting when content changes.
     useEffect(() => {
         Prism.highlightAll();
     }, [content]);
 
-    // Check if the content is overflowing once it has been rendered.
-    useEffect(() => {
-        if (display === "answer" && contentRef.current) {
-            // Check if the content's scrollHeight exceeds its clientHeight.
-            const isOverflowing = contentRef.current.scrollHeight > contentRef.current.clientHeight;
-            setShowToggle(isOverflowing);
-        }
-    }, [content, display, isClamped]);
-
-    // Toggle the clamping state on button click.
-    const toggleClamp = () => {
-        setIsClamped(prev => !prev);
-    };
-
-    return (
-        <>
-            <div
-                ref={contentRef}
-                className={`markdown min-w-full ${display === "answer" && isClamped ? "line-clamp-5" : ""}`}
-            >
-                {parse(content)}
-            </div>
-            {display === "answer" && showToggle && (
-                <button onClick={toggleClamp} className="mt-2 text-blue-500 focus:outline-none">
-                    {isClamped ? "Read more" : "Read less"}
-                </button>
-            )}
-        </>
-    );
+    return <div className="markdown min-w-full">{parse(content)}</div>;
 }

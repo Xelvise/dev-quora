@@ -54,7 +54,7 @@ export default function AnswerCard({ answer, signedInUser }: Props) {
                 </div>
             </div>
 
-            <ContentParser content={answer.content} display="answer" />
+            <ContentParser content={answer.content} />
         </article>
     );
 }

@@ -45,7 +45,6 @@ export default function PopulateAnswerCard({ serverAction, stringifiedInitialDat
     }, [stringifiedInitialData]);
 
     
-
     const handleLoadMore = async () => {
         setLoading(true); setPageNo(prev => prev + 1);
         console.log("Starting to load more answers");
