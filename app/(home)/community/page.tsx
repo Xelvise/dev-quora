@@ -42,7 +42,10 @@ export default async function Community({ searchParams }: Props) {
                 {users.length > 0 ? (
                     users.map(user => <UserCard key={user.id} user={user} />)
                 ) : (
-                    <NoResults title="No Users yet" />
+                    <NoResults
+                        title="There are no Users yet 😞"
+                        desc="Why not be the first to register and earn yourself a badge? 😃"
+                    />
                 )}
             </section>
         </main>

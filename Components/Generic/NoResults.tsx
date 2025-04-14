@@ -11,7 +11,7 @@ interface Props {
 
 export default function NoResults({ title, desc, link, linkTitle }: Props) {
     return (
-        <div className="mt-5 flex w-full flex-col items-center justify-center gap-4">
+        <div className="mt-5 flex w-full flex-col items-center justify-center gap-5">
             <Image
                 src="/assets/images/light-illustration.png"
                 alt="light illustration"
@@ -28,7 +28,7 @@ export default function NoResults({ title, desc, link, linkTitle }: Props) {
             />
             <h1 className="text-dark200_light900 h3-bold max-sm:paragraph-semibold text-center">{title}</h1>
             {desc && (
-                <p className="text-dark100_light700 paragraph-medium max-sm:body-regular max-w-md text-center">
+                <p className="text-dark100_light700 paragraph-medium max-sm:body-regular max-w-md text-center max-sm:max-w-sm">
                     {desc}
                 </p>
             )}

@@ -16,21 +16,19 @@ export default function UserStats({ totalAnswers, totalQuestions, badgeCounts, r
 
     return (
         <div className="mt-14 max-sm:mt-10">
-            <p className="base-semibold text-dark400_light900 max-sm:paragraph-semibold mb-3">
-                ⭐ {reputationLevel} Reward points
+            <p className="base-semibold text-dark400_light900 max-sm:paragraph-regular mb-3 max-sm:ml-2">
+                {/* Add a tooltip to display info about roys */}⭐ {reputationLevel} roys
             </p>
             <div className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-4">
-                <div className="light-border bg-light900_dark300 flex flex-wrap items-center gap-4 rounded-md border p-6 shadow-light-300 dark:shadow-dark-200">
+                <div className="card-wrapper dark:card-wrapper-dark solid-light-border bg-light900_dark300 flex items-center gap-4 rounded-md border p-6">
                     <div>
-                        <p className="paragraph-semibold text-dark200_light900">{questionCount}</p>
-                        <p className="body-medium text-dark200_light700">
-                            {questionCount === "1" ? "Question" : "Questions"}
+                        <p className="body-medium text-dark200_light900">
+                            {questionCount === "1" ? questionCount + "  Question," : questionCount + " Questions,"}
                         </p>
                     </div>
                     <div>
-                        <p className="paragraph-semibold text-dark200_light900">{answerCount}</p>
-                        <p className="body-medium text-dark200_light700">
-                            {answerCount === "1" ? "Answer" : "Answers"}
+                        <p className="body-medium text-dark200_light900">
+                            {answerCount === "1" ? answerCount + " Answer" : answerCount + " Answers"}
                         </p>
                     </div>
                 </div>
@@ -46,10 +44,10 @@ export default function UserStats({ totalAnswers, totalQuestions, badgeCounts, r
 const StatsCard = (props: { imgURL: string; value: number; title: string }) => {
     const { imgURL, value, title } = props;
     return (
-        <div className="light-border bg-light900_dark300 flex flex-wrap items-center justify-start gap-4 rounded-md border p-6 shadow-light-300 dark:shadow-dark-200">
+        <div className="card-wrapper dark:card-wrapper-dark solid-light-border bg-light900_dark300 flex flex-wrap items-center justify-start gap-4 rounded-md border p-6">
             <Image src={imgURL} alt="title" width={40} height={50} />
             <div>
-                <p className="paragraph-semibold text-dark200_light900">{value}</p>
+                <p className="body-medium text-dark200_light900">{value}</p>
                 <p className="body-medium text-dark200_light700">{title}</p>
             </div>
         </div>

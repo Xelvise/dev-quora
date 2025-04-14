@@ -50,8 +50,8 @@ export default async function SavedCollection({ searchParams }: Props) {
                 stringifiedSignedInUser={JSON.stringify(user)}
             >
                 <NoResults
-                    title="No Saved Questions Found"
-                    desc="It appears there are no saved questions in your collection at the moment 😞. Be sure to give a Question a star and you'll find it here 😃"
+                    title="Turns out you haven't saved any questions yet 😞"
+                    desc="Be sure to give a Question a star and you'll find it here 😃"
                     link="/"
                     linkTitle="Explore Questions"
                 />

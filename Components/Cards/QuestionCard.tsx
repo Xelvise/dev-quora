@@ -13,13 +13,13 @@ interface Props {
 }
 
 export default function QuestionCard({ question, signedInUser }: Props) {
-    const { _id, id, title, upvotes, downvotes, views, answers, createdAt } = question;
+    const { _id, title, upvotes, downvotes, views, answers, createdAt } = question;
     const questionAuthor = question.author as any as UserDoc;
     const questionTags = question.tags as any as TagDoc[];
     const totalVotes = upvotes.length + downvotes.length;
 
     return (
-        <div className="shadow-effect flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
+        <div className="card-wrapper dark:card-wrapper-dark solid-light-border flex flex-col items-start justify-center gap-5 rounded-[10px] px-6 py-8 max-sm:px-4 max-sm:py-5">
             <div className="flex w-full flex-col-reverse items-start gap-1">
                 <div className="flex flex-col gap-1">
                     <p className="subtle-regular text-dark200_light700 line-clamp-1 md:hidden">{`asked ${calcTimeDiff(new Date(createdAt))}`}</p>

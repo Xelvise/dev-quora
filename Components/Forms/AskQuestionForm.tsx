@@ -151,7 +151,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                     name="title"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="paragraph-semibold text-dark200_light800">
+                            <FormLabel className="paragraph-semibold max-sm:body-semibold text-dark200_light800">
                                 Question Title <span className="text-primary-500">*</span>
                             </FormLabel>
                             <FormControl>
@@ -173,7 +173,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                     name="explanation"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="paragraph-semibold text-dark200_light800">
+                            <FormLabel className="paragraph-semibold max-sm:body-semibold text-dark200_light800">
                                 Detailed explanation of the problem <span className="text-primary-500">*</span>
                             </FormLabel>
                             <FormControl>
@@ -211,7 +211,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                     name="tags"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="paragraph-semibold text-dark200_light800">
+                            <FormLabel className="paragraph-semibold max-sm:body-semibold text-dark200_light800">
                                 Tags <span className="text-primary-500">*</span>
                             </FormLabel>
                             <FormControl>

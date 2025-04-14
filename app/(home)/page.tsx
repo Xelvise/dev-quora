@@ -14,8 +14,26 @@ export const metadata: Metadata = {
     title: "Home | DevQuora",
     description:
         "A community-driven platform for asking and answering programming questions. Get help, share knowledge and collaborate with developers around the world. Explore topics in Web development, mobile app development, algorithms, data structures and more.",
-    icons: {
-        icon: "/assets/images/site-logo.svg",
+    applicationName: "DevQuora",
+    authors: { name: "Elvis Gideon", url: "https://linkedin.com/in/elvisgideon001" },
+    icons: { icon: "/assets/images/site-logo.svg" },
+    // prettier-ignore
+    keywords: [ "DevQuora", "Dev community", "stack overflow", "question and answer", "Q&A", "programming", "developers" ],
+    creator: "Elvis Gideon",
+    openGraph: {
+        title: "DevQuora - Programming Q&A Platform",
+        description: "A community-driven platform for asking and answering programming questions.",
+        url: "https://dev-quora.vercel.app/",
+        siteName: "DevQuora",
+        images: [
+            {
+                url: "https://dev-quora.vercel.app/app-image.png",
+                width: 1200,
+                height: 630,
+                alt: "DevQuora Preview",
+            },
+        ],
+        type: "website",
     },
 };
 
