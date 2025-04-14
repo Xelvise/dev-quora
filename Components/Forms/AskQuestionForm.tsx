@@ -182,7 +182,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                                     key={`${mode} theme`}
                                     apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
                                     onInit={(_, editor) => (editorRef.current = editor as any)}
-                                    initialValue={editorContent}
+                                    value={editorContent}
                                     onBlur={field.onBlur}
                                     onEditorChange={handleEditorChange}
                                     init={{
@@ -198,7 +198,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                                 />
                             </FormControl>
                             <FormDescription className="body-regular text-light-500">
-                                Introduce the problem and expand on what you wrote in the title. Minimum of 20
+                                Introduce the problem and expand on what you wrote in the title. Minimum of 50
                                 characters
                             </FormDescription>
                             <FormMessage className="body-regular text-red-500" />

@@ -134,6 +134,24 @@ export async function fetchQuestionByID(question_id: string) {
     }
 }
 
+export async function getPostAuthorID(post_id: string, type: "question" | "answer") {
+    try {
+        await connectToDB();
+        if (type === "question") {
+            const question = await QuestionCollection.findById<QuestionDoc>(post_id);
+            if (!question) throw new Error("Question not found");
+            return question.author.toString();
+        } else if (type === "answer") {
+            const answer = await AnswerCollection.findById<AnswerDoc>(post_id);
+            if (!answer) throw new Error("Answer not found");
+            return answer.author.toString();
+        }
+    } catch (error) {
+        console.log(`Failed to retrieve ${type} author ID`, error);
+        throw new Error(`Failed to retrieve ${type} author ID`);
+    }
+}
+
 export async function fetchHotQuestions() {
     try {
         await connectToDB();
@@ -253,29 +271,31 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     try {
         await connectToDB();
         let updateQuery = {};
-        if (hasUpvoted) {
-            // if user has already upvoted, pull out/delete the User's ID from upvotes array
-            updateQuery = { $pull: { upvotes: user_id } };
-        } else if (hasDownvoted) {
-            // if user has downvoted, pull out/delete user's ID from the downvotes array and append to the upvotes array
-            updateQuery = { $pull: { downvotes: user_id }, $push: { upvotes: user_id } };
-        } else {
-            // If user has neither upvoted nor downvoted, add a new upvote of UserId to the set of upvotes
-            updateQuery = { $addToSet: { upvotes: user_id } };
-        }
-        const upvotedQuestion = await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
-            new: true,
-        });
+        const upvotedQuestion = await QuestionCollection.findById<QuestionDoc>(question_id);
         if (!upvotedQuestion) throw new Error("Question not found, hence could not be upvoted");
 
+        // Check if the user is the author of the question
+        // prettier-ignore
         if (String(upvotedQuestion.author) !== String(user_id)) {
+            if (hasUpvoted) {
+                // if user has already upvoted, pull out/delete the User's ID from upvotes array
+                updateQuery = { $pull: { upvotes: user_id } };
+            } else if (hasDownvoted) {
+                // if user has downvoted, pull out/delete user's ID from the downvotes array and append to the upvotes array
+                updateQuery = { $pull: { downvotes: user_id }, $push: { upvotes: user_id } };
+            } else {
+                // If user has neither upvoted nor downvoted, add a new upvote of UserId to the set of upvotes
+                updateQuery = { $addToSet: { upvotes: user_id } };
+            }
+            await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, { new: true });
+
             // increment User's reputation by +2 or -2 for upvoting or revoking an upvote to a question
             await UserCollection.findByIdAndUpdate(user_id, {
                 $inc: { reputation: hasUpvoted ? -2 : 2 },
             });
-            // increment Author's reputation by +10 or -10 for receiving or deleting an upvote to/from a question
+            // increment Author's reputation by +5 or -5 for receiving or deleting an upvote to/from a question
             await UserCollection.findByIdAndUpdate(upvotedQuestion.author, {
-                $inc: { reputation: hasUpvoted ? -10 : 10 },
+                $inc: { reputation: hasUpvoted ? -5 : 5 },
             });
         }
 
@@ -293,29 +313,31 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     try {
         await connectToDB();
         let updateQuery = {};
-        if (hasDownvoted) {
-            // if user has downvoted, we pull out/delete user's ID from the downvotes array
-            updateQuery = { $pull: { downvotes: user_id } };
-        } else if (hasUpvoted) {
-            // if user has already upvoted, we pull out/delete the User's ID from upvotes array and append to the downvotes array
-            updateQuery = { $pull: { upvotes: user_id }, $push: { downvotes: user_id } };
-        } else {
-            // If user has neither upvoted nor downvoted, we add a new downvote of UserId to the set of downvotes
-            updateQuery = { $addToSet: { downvotes: user_id } };
-        }
-        const downvotedQuestion = await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, {
-            new: true,
-        });
+        const downvotedQuestion = await QuestionCollection.findById<QuestionDoc>(question_id);
         if (!downvotedQuestion) throw new Error("Question not found, hence could not be upvoted");
 
+        // Check if the user is the author of the question
+        // prettier-ignore
         if (String(downvotedQuestion.author) !== String(user_id)) {
+            if (hasDownvoted) {
+                // if user has downvoted, we pull out/delete user's ID from the downvotes array
+                updateQuery = { $pull: { downvotes: user_id } };
+            } else if (hasUpvoted) {
+                // if user has already upvoted, we pull out/delete the User's ID from upvotes array and append to the downvotes array
+                updateQuery = { $pull: { upvotes: user_id }, $push: { downvotes: user_id } };
+            } else {
+                // If user has neither upvoted nor downvoted, we add a new downvote of UserId to the set of downvotes
+                updateQuery = { $addToSet: { downvotes: user_id } };
+            }
+            await QuestionCollection.findByIdAndUpdate<QuestionDoc>(question_id, updateQuery, { new: true });
+
             // increment User's reputation by +2 or -2 for downvoting or revoking an upvote to a question
             await UserCollection.findByIdAndUpdate(user_id, {
                 $inc: { reputation: hasDownvoted ? -2 : 2 },
             });
-            // increment Author's reputation by -10 or +10 for receiving or deleting a downvote to/from a question
+            // increment Author's reputation by -5 or +5 for receiving or deleting a downvote to/from a question
             await UserCollection.findByIdAndUpdate(downvotedQuestion.author, {
-                $inc: { reputation: hasDownvoted ? 10 : -10 },
+                $inc: { reputation: hasDownvoted ? 5 : -5 },
             });
         }
 
@@ -388,7 +410,7 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
             });
         }
         if (question.upvotes.length > 0) {
-            const count = question.upvotes.length * 10;
+            const count = question.upvotes.length * 5;
             await UserCollection.findByIdAndUpdate(question.author, {
                 $inc: { reputation: -count },
             });
@@ -401,11 +423,10 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
         if (question.answers.length > 0) {
             for (const answer_id of question.answers) {
                 const answer = await AnswerCollection.findById<AnswerDoc>(answer_id);
-                await UserCollection.findByIdAndUpdate(answer?.author, {
-                    $inc: { reputation: -10 },
-                });
+                // Even if question is deleted, we do not delete author's reputation earned from creating answer (unless the answer is deleted by the author)
+                // However, we delete all the extra reputations the author earned from people that upvoted
                 if (answer && answer.upvotes.length > 0) {
-                    const count = answer.upvotes.length * 10;
+                    const count = answer.upvotes.length * 5;
                     await UserCollection.findByIdAndUpdate(answer.author, {
                         $inc: { reputation: -count },
                     });
@@ -428,8 +449,10 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
         await TagCollection.updateMany({ questions: question_id }, { $pull: { questions: question_id } });
         // Step 3: Delete tags that now have empty questions arrays
         for (const tagDoc of questionTags) {
-            // delete all tagDocs with questions length of 0
-            if (tagDoc.questions.length === 0) {
+            // Check the current state of the tag after the question_id has been removed
+            const updatedTag = await TagCollection.findById<TagDoc>(tagDoc._id);
+            // Delete tag if it exists and its questions array is empty
+            if (updatedTag && updatedTag.questions.length === 0) {
                 await TagCollection.findByIdAndDelete(tagDoc._id);
             }
         }

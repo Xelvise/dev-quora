@@ -95,7 +95,7 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
             const { id } = toast({
                 title: "Gemini is thinking...",
                 variant: "default",
-                duration: 5000,
+                duration: 3000,
             });
             setThinkingToastId(id);
 
@@ -183,7 +183,7 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
                                         key={`${mode} theme`}
                                         apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
                                         onInit={(_, editor) => (editorRef.current = editor as any)}
-                                        initialValue={editorContent}
+                                        value={editorContent}
                                         onBlur={field.onBlur}
                                         onEditorChange={handleEditorChange}
                                         init={{

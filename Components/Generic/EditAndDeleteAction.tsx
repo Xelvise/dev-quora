@@ -59,7 +59,7 @@ export default function EditAndDeleteAction({ postType, post_id, exitPageAfterDe
     };
     return (
         <div className="flex items-center gap-3 max-sm:gap-2">
-            <p className="text-dark500_light900 h3-regular max-sm:paragraph-regular">|</p>
+            <p className="text-dark500_light900 h-full">|</p>
             <Image
                 src="/assets/icons/edit.svg"
                 alt="Edit"

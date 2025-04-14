@@ -132,9 +132,9 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
             await UserCollection.findByIdAndUpdate(user_id, {
                 $inc: { reputation: hasUpvoted ? -2 : 2 },
             });
-            // increment Author's reputation by +10 or -10 for receiving or deleting an upvote to/from a question
+            // increment Author's reputation by +5 or -5 for receiving or deleting an upvote to/from a question
             await UserCollection.findByIdAndUpdate(upvotedAnswer.author, {
-                $inc: { reputation: hasUpvoted ? -10 : 10 },
+                $inc: { reputation: hasUpvoted ? -5 : 5 },
             });
         }
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path
@@ -167,13 +167,13 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
         if (!downvotedAnswer) throw new Error("Answer not found, hence could not be downvoted");
 
         if (String(downvotedAnswer.author) !== String(user_id)) {
-            // increment User's reputation by +2 or -2 for downvoting or revoking an upvote to a question
+            // increment User's reputation by +2 or -2 for downvoting or revoking an upvote to an answer
             await UserCollection.findByIdAndUpdate(user_id, {
                 $inc: { reputation: hasDownvoted ? -2 : 2 },
             });
-            // increment Author's reputation by -10 or +10 for receiving or deleting a downvote to/from a question
+            // increment Author's reputation by -5 or +5 for receiving or deleting a downvote to/from an answer
             await UserCollection.findByIdAndUpdate(downvotedAnswer.author, {
-                $inc: { reputation: hasDownvoted ? 10 : -10 },
+                $inc: { reputation: hasDownvoted ? 5 : -5 },
             });
         }
         if (pathToRefetch) revalidatePath(pathToRefetch); // purges cache data for the specified path

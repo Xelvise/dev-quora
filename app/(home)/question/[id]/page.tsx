@@ -56,9 +56,7 @@ export default async function QuestionDetails({ params, searchParams }: Props) {
                         width={25}
                         height={25}
                     />
-                    <p className="paragraph-semibold max-sm:body-semibold text-dark300_light700">
-                        {questionAuthor.name}
-                    </p>
+                    <p className="paragraph-semibold max-sm:body-medium text-dark300_light700">{questionAuthor.name}</p>
                 </Link>
                 <div className="flex items-center justify-end gap-3 max-sm:gap-2">
                     <VoteSection

@@ -40,7 +40,7 @@ export default function Filters({ type, filterData, defaultFilterValue, placehol
         return (
             <Select onValueChange={value => handleFilterSelection(value)}>
                 <SelectTrigger
-                    className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular rounded-[7px] border-none px-4 focus:ring-transparent h-[50px] min-w-[170px] ${menuTriggerClassName}`}
+                    className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular rounded-[7px] border-none max-sm:p-5 focus:ring-transparent sm:h-[50px] min-w-[170px] ${menuTriggerClassName}`}
                 >
                     <SelectValue
                         placeholder={

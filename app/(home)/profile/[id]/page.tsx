@@ -41,7 +41,10 @@ export default async function Profile({ params }: Props) {
                     />
                     <div className="mt-3 flex flex-col">
                         <p className="h2-bold max-sm:base-semibold text-dark500_light900">{user.name}</p>
-                        <p className="paragraph-regular max-sm:body-regular text-dark400_light800">@{user.username}</p>
+                        <p className="paragraph-regular max-sm:body-regular">
+                            <span className="text-dark200_light500">@</span>
+                            <span className="text-dark400_light800">{user.username}</span>
+                        </p>
                         <div className="mt-3 flex flex-wrap gap-5 max-sm:flex-col max-sm:gap-2 sm:items-center">
                             {user.portfolioWebsite && (
                                 <ProfileLink

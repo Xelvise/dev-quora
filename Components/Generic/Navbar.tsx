@@ -1,14 +1,11 @@
-import { SignedIn, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeSwitch from "./ThemeSwitch";
 import MobileSidebar from "../Sidebar/MobileSidebar";
 import { GlobalSearchBar } from "./GlobalSearchBar";
 import MobileSearchModal from "./MobileSearchModal";
-import { auth } from "@clerk/nextjs/server";
-
 export default async function Navbar() {
-    const { userId: clerkId } = await auth();
     return (
         <>
             {/* Desktop-only */}
@@ -37,18 +34,19 @@ export default async function Navbar() {
 
             {/* Mobile-only */}
             <nav className="bg-light900_dark400 shadow-effect fixed z-50 flex w-full items-center justify-between gap-5 px-8 py-4 dark:shadow-none max-sm:px-5 max-sm:py-3 sm:hidden">
-                {clerkId ? (
+                <SignedIn>
                     <UserButton
                         appearance={{
                             elements: { avatarBox: "h-10 w-10" },
                             variables: { colorPrimary: "#ff7000" },
                         }}
                     />
-                ) : (
+                </SignedIn>
+                <SignedOut>
                     <Link href="/">
                         <Image src="/assets/images/site-logo.svg" width={23} height={23} alt="DevQuora" />
                     </Link>
-                )}
+                </SignedOut>
 
                 <MobileSearchModal />
 

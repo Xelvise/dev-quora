@@ -2,7 +2,12 @@
 
 import { formatNumber } from "@/app/utils";
 import { downvoteAnswer, upvoteAnswer } from "@/Backend/Server-Side/Actions/answer.action";
-import { downvoteQuestion, toggleSaveQuestion, upvoteQuestion } from "@/Backend/Server-Side/Actions/question.action";
+import {
+    downvoteQuestion,
+    getPostAuthorID,
+    toggleSaveQuestion,
+    upvoteQuestion,
+} from "@/Backend/Server-Side/Actions/question.action";
 import { useToast } from "@/Components/Shadcn/hooks/use-toast";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -42,9 +47,18 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                 action: <ToastAction altText="Sign in" onClick={() => router.push("/sign-in")}>Sign In</ToastAction>,
             });
         }
-
         setReclickState(prev => ({ ...prev, canUpvote: false, canDownvote: false }));
+
         if (action === "upvote") {
+            // Check if the user is the author of the post
+            const authorId = await getPostAuthorID(post_id, postType);
+            if (authorId === userId) {
+                return toast({
+                    title: "You cannot upvote your own post",
+                    variant: "destructive",
+                    duration: 3000,
+                });
+            }
             setUpvotedOptimistically(!hasUpvotedOptimistically);
             setOptimisticUpvotes(hasUpvotedOptimistically ? optimisticUpvotes - 1 : optimisticUpvotes + 1);
             if (hasDownvotedOptimistically) {
@@ -80,6 +94,15 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
             }
 
         } else if (action === "downvote") {
+            // Check if the user is the author of the post
+            const authorId = await getPostAuthorID(post_id, postType);
+            if (authorId === userId) {
+                return toast({
+                    title: "You cannot downvote your own post",
+                    variant: "destructive",
+                    duration: 3000,
+                });
+            }
             setDownvotedOptimistically(!hasDownvotedOptimistically);
             setOptimisticDownvotes(hasDownvotedOptimistically ? optimisticDownvotes - 1 : optimisticDownvotes + 1);
             if (hasUpvotedOptimistically) {

@@ -22,7 +22,7 @@ export default function AnswerCard({ answer, signedInUser }: Props) {
             <div className="flex flex-1 justify-between gap-2 max-sm:flex-col-reverse max-sm:gap-0 sm:items-center">
                 <Link
                     href={`/profile/${answerAuthor.clerkId}`}
-                    className="flex flex-1 items-start gap-1 sm:items-center"
+                    className="flex flex-1 items-start gap-2 sm:items-center"
                 >
                     <Image
                         src={answerAuthor.picture}
@@ -31,8 +31,10 @@ export default function AnswerCard({ answer, signedInUser }: Props) {
                         alt="profile"
                         className="rounded-full object-cover max-sm:mt-0.5"
                     />
-                    <div className="flex gap-1 max-sm:flex-col sm:items-center">
-                        <p className="body-semibold text-dark300_light700">{answerAuthor.name}</p>
+                    <div className="flex gap-1 max-sm:flex-col max-sm:gap-[1px] sm:items-center">
+                        <p className="paragraph-semibold max-sm:body-medium text-dark300_light700">
+                            {answerAuthor.name}
+                        </p>
                         <p className="small-regular text-light400_light500 ml-0.5 line-clamp-1 cursor-text">
                             <span className="max-sm:hidden"> - </span> answered{" "}
                             {calcTimeDiff(new Date(answer.createdAt))}
