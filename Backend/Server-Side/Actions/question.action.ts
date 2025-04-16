@@ -101,14 +101,13 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
             _id: { $in: userDoc.saved }, // Only get questions that are in the user's saved array
             ...filterQuery, // Apply any additional filters
         })
-            .sort(sortOptions as any)
             .skip(past_pages)
             .limit(pageSize)
             .populate([
                 { path: "tags", model: TagCollection },
                 { path: "author", model: UserCollection },
-            ]);
-
+            ])
+            .sort(sortOptions as any);
         const hasMorePages = totalQuestions > past_pages + savedQuestions.length;
         return JSON.stringify({ questions: savedQuestions, hasMorePages });
     } catch (error) {
