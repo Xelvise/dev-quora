@@ -111,23 +111,22 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
     const { answer_id, user_id, hasUpvoted, hasDownvoted, pathToRefetch } = params;
     try {
         await connectToDB();
-        let updateQuery = {};
-        if (hasUpvoted) {
-            // if user has already upvoted, we pull out/delete the User's ID from upvotes array
-            updateQuery = { $pull: { upvotes: user_id } };
-        } else if (hasDownvoted) {
-            // if user has downvoted, we pull out/delete user's ID from the downvotes array and append to the upvotes array
-            updateQuery = { $pull: { downvotes: user_id }, $push: { upvotes: user_id } };
-        } else {
-            // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
-            updateQuery = { $addToSet: { upvotes: user_id } };
-        }
-        const upvotedAnswer = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
-            new: true,
-        });
+        const upvotedAnswer = await AnswerCollection.findById<AnswerDoc>(answer_id);
         if (!upvotedAnswer) throw new Error("Answer not found, hence could not be upvoted");
-
         if (String(upvotedAnswer.author) !== String(user_id)) {
+            let updateQuery = {};
+            if (hasUpvoted) {
+                // if user has already upvoted, we pull out/delete the User's ID from upvotes array
+                updateQuery = { $pull: { upvotes: user_id } };
+            } else if (hasDownvoted) {
+                // if user has downvoted, we pull out/delete user's ID from the downvotes array and append to the upvotes array
+                updateQuery = { $pull: { downvotes: user_id }, $push: { upvotes: user_id } };
+            } else {
+                // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
+                updateQuery = { $addToSet: { upvotes: user_id } };
+            }
+            await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, { new: true });
+
             // increment User's reputation by +2 or -2 for upvoting or revoking an upvote to a question
             await UserCollection.findByIdAndUpdate(user_id, {
                 $inc: { reputation: hasUpvoted ? -2 : 2 },
@@ -150,23 +149,22 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     const { answer_id, user_id, hasUpvoted, hasDownvoted, pathToRefetch } = params;
     try {
         await connectToDB();
-        let updateQuery = {};
-        if (hasDownvoted) {
-            // if user has downvoted, we pull out/delete user's ID from the downvotes array
-            updateQuery = { $pull: { downvotes: user_id } };
-        } else if (hasUpvoted) {
-            // if user has already upvoted, we pull out/delete the User's ID from upvotes array and append to the downvotes array
-            updateQuery = { $pull: { upvotes: user_id }, $push: { downvotes: user_id } };
-        } else {
-            // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
-            updateQuery = { $addToSet: { downvotes: user_id } };
-        }
-        const downvotedAnswer = await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, {
-            new: true,
-        });
+        const downvotedAnswer = await AnswerCollection.findById<AnswerDoc>(answer_id);
         if (!downvotedAnswer) throw new Error("Answer not found, hence could not be downvoted");
-
         if (String(downvotedAnswer.author) !== String(user_id)) {
+            let updateQuery = {};
+            if (hasDownvoted) {
+                // if user has downvoted, we pull out/delete user's ID from the downvotes array
+                updateQuery = { $pull: { downvotes: user_id } };
+            } else if (hasUpvoted) {
+                // if user has already upvoted, we pull out/delete the User's ID from upvotes array and append to the downvotes array
+                updateQuery = { $pull: { upvotes: user_id }, $push: { downvotes: user_id } };
+            } else {
+                // If user has neither upvoted nor downvoted, we add a new upvote of UserId to the set of upvotes
+                updateQuery = { $addToSet: { downvotes: user_id } };
+            }
+            await AnswerCollection.findByIdAndUpdate<AnswerDoc>(answer_id, updateQuery, { new: true });
+
             // increment User's reputation by +2 or -2 for downvoting or revoking an upvote to an answer
             await UserCollection.findByIdAndUpdate(user_id, {
                 $inc: { reputation: hasDownvoted ? -2 : 2 },
