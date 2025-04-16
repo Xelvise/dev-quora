@@ -40,7 +40,7 @@ export default function Filters({ type, filterData, defaultFilterValue, placehol
         return (
             <Select onValueChange={value => handleFilterSelection(value)}>
                 <SelectTrigger
-                    className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular rounded-[7px] border-none max-sm:p-5 focus:ring-transparent sm:h-[50px] min-w-[170px] ${menuTriggerClassName}`}
+                    className={`bg-light800_darkgradient text-dark100_light700 paragraph-regular max-sm:body-regular min-w-[170px] rounded-[7px] border-none focus:ring-transparent max-sm:p-5 sm:h-[50px] ${menuTriggerClassName}`}
                 >
                     <SelectValue
                         placeholder={
@@ -58,9 +58,11 @@ export default function Filters({ type, filterData, defaultFilterValue, placehol
                     className={`bg-light800_dark200 text-dark100_light700 rounded-[7px] border-none p-1 ${menuContentClassName}`}
                 >
                     <SelectGroup>
-                        <SelectLabel className="paragraph-regular text-light-400">{placeholder}</SelectLabel>
+                        <SelectLabel className="paragraph-regular max-sm:body-regular text-light-400">
+                            {placeholder}
+                        </SelectLabel>
                         {filterData.map(({ value, name }, index) => (
-                            <SelectItem key={index} value={value} className="paragraph-regular">
+                            <SelectItem key={index} value={value} className="paragraph-regular max-sm:body-regular">
                                 {name}
                             </SelectItem>
                         ))}

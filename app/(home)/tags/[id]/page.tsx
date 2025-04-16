@@ -17,27 +17,21 @@ export default async function TagDetails({ params, searchParams }: Props) {
     const { userId: clerkId } = await auth();
     const user = await getSignedInUser(clerkId);
 
-    try {
-        const { tagTitle, questions } = await fetchAllQuestionsByTagID({ tag_id: id, searchQuery: q });
-        console.log({ questions });
-        return (
-            <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
-                <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">{tagTitle}</h1>
+    const { tagTitle, questions } = await fetchAllQuestionsByTagID({ tag_id: id, searchQuery: q });
+    console.log({ questions });
+    return (
+        <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
+            <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">{tagTitle}</h1>
 
-                <div className="flex w-full">
-                    <LocalSearchBar placeholder={`Search questions associated with ${tagTitle}`} assetIcon="search" />
-                </div>
+            <div className="flex w-full">
+                <LocalSearchBar placeholder={`Search questions associated with ${tagTitle}`} assetIcon="search" />
+            </div>
 
-                <div className="flex w-full flex-col gap-6">
-                    {questions.map(question => (
-                        <QuestionCard key={question.id} question={question} signedInUser={user} />
-                    ))}
-                </div>
-            </main>
-        );
-    } catch (error) {
-        if (error instanceof Error && error.message === "Tag not found") {
-            // TODO: render a Toaster beneath the page to inform User of resulting error
-        }
-    }
+            <div className="flex w-full flex-col gap-6">
+                {questions.map(question => (
+                    <QuestionCard key={question.id} question={question} signedInUser={user} />
+                ))}
+            </div>
+        </main>
+    );
 }
