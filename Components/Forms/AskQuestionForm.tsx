@@ -252,7 +252,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                 {/* prettier-ignore */}
                 <Button
                     type="submit"
-                    className="primary-gradient flex w-fit gap-2 self-center rounded-[7px] text-light-800"
+                    className="primary-gradient flex w-fit gap-2 self-center rounded-[7px] text-light-800 mt-5"
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? (
