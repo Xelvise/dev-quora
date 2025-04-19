@@ -160,7 +160,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                                     {...field}
                                 />
                             </FormControl>
-                            <FormDescription className="body-regular text-light-500">
+                            <FormDescription className="body-regular max-sm:small-regular text-light-500">
                                 Be specific and imagine you&apos;re asking a question to another person
                             </FormDescription>
                             <FormMessage className="body-regular text-red-500" />
@@ -197,7 +197,7 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                                     }}
                                 />
                             </FormControl>
-                            <FormDescription className="body-regular text-light-500">
+                            <FormDescription className="body-regular max-sm:small-regular text-light-500">
                                 Introduce the problem and expand on what you wrote in the title. Minimum of 50
                                 characters
                             </FormDescription>
@@ -241,9 +241,9 @@ export default function AskQuestionForm({ formType = "create", user_id, stringif
                                     ))}
                                 </div>
                             )}
-                            <FormDescription className="body-regular text-light-500">
-                                Add up to 3 tags to describe what your question is about. You need to press Enter to
-                                enter a tag
+                            <FormDescription className="body-regular max-sm:small-regular text-light-500">
+                                Add up to 3 tags to describe what your question is about. Press Enter key after every
+                                tag
                             </FormDescription>
                             <FormMessage className="body-regular text-red-500" />
                         </FormItem>
