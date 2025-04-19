@@ -38,7 +38,7 @@ export default async function Community({ searchParams }: Props) {
                 </div>
             </div>
 
-            <section className="flex flex-wrap gap-4">
+            <section className="grid gap-5 max-xs:grid-cols-1 xs:grid-cols-2 md:grid-cols-4">
                 {users.length > 0 ? (
                     users.map(user => <UserCard key={user.id} user={user} />)
                 ) : (

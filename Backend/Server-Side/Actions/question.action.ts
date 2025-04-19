@@ -97,6 +97,10 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
         if (!userDoc) throw new Error("User not found");
 
         const totalQuestions = userDoc.saved.length;
+        // If the user has no saved questions, return empty results immediately
+        if (totalQuestions === 0) {
+            return JSON.stringify({ questions: [], hasMorePages: false });
+        }
         const savedQuestions = await QuestionCollection.find({
             _id: { $in: userDoc.saved }, // Only get questions that are in the user's saved array
             ...filterQuery, // Apply any additional filters
@@ -108,6 +112,8 @@ export async function fetchSavedQuestions(params: GetSavedQuestionsParams) {
                 { path: "author", model: UserCollection },
             ])
             .sort(sortOptions as any);
+
+        // Ensure hasMorePages is only true when there are actually more questions to load
         const hasMorePages = totalQuestions > past_pages + savedQuestions.length;
         return JSON.stringify({ questions: savedQuestions, hasMorePages });
     } catch (error) {
@@ -438,6 +444,8 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
             }
         }
         await QuestionCollection.deleteOne({ _id: question_id });
+        if (pathToRefetch) revalidatePath(pathToRefetch);
+        await UserCollection.updateMany({ saved: question_id }, { $pull: { saved: question_id } });
         await AnswerCollection.deleteMany({ question: question_id });
         await InteractionCollection.deleteMany({ question: question_id });
 
@@ -455,7 +463,6 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
                 await TagCollection.findByIdAndDelete(tagDoc._id);
             }
         }
-        if (pathToRefetch) revalidatePath(pathToRefetch);
     } catch (error) {
         console.log("Failed to delete question", error);
         throw new Error("Failed to delete question");

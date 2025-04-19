@@ -12,8 +12,7 @@ export default function Loading() {
             {/* Search and filters */}
             <div className="flex w-full gap-5 max-md:flex-row max-md:justify-between max-sm:flex-col max-sm:gap-3 md:flex-col">
                 <Skeleton className="h-14 w-full rounded-[7px]" />
-                <Skeleton className="h-14 rounded-[7px] max-md:w-40 md:w-full" />
-                <Skeleton className="h-14 w-40 rounded-[7px] md:hidden" />
+                <Skeleton className="h-14 w-full rounded-[7px]" />
             </div>
 
             {/* Question cards */}

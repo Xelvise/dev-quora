@@ -7,21 +7,26 @@ import Tag from "../Generic/Tag";
 export default async function UserCard({ user }: { user: UserDoc }) {
     const interactedTags = await fetchTopInteractedTags({ user_id: user.id });
     return (
-        <Link
-            href={`/profile/${user.clerkId}`}
-            className="card-wrapper dark:card-wrapper-dark rounded-2xl max-xs:min-w-full xs:w-[260px]"
-        >
-            <article className="solid-light-border flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl p-8">
-                <Image src={user.picture} alt="Profile picture" width={100} height={100} className="rounded-full" />
+        <Link href={`/profile/${user.clerkId}`}>
+            <article className="card-wrapper dark:card-wrapper-dark solid-light-border flex flex-1 flex-col flex-wrap items-center justify-center gap-4 rounded-2xl p-8">
+                <Image
+                    src={user.picture}
+                    alt="Profile picture"
+                    width={100}
+                    height={100}
+                    className="rounded-full object-contain"
+                />
                 <div className="text-center">
-                    <h1 className="h3-bold text-dark400_light900 line-clamp-1">{user.name}</h1>
+                    <h1 className="h3-bold text-dark400_light900 max-sm:paragraph-semibold line-clamp-1">
+                        {user.name}
+                    </h1>
                     <p className="body-regular text-dark100_light500 mt-1">@{user.username}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                     {interactedTags.map(tag => (
                         <Tag key={tag.id} tag_id={tag.id} name={tag.name} badgeClassNames="subtle-medium uppercase" />
                     ))}
-                </div>
+                </div> */}
             </article>
         </Link>
     );
