@@ -33,7 +33,16 @@ export default async function SavedCollection({ searchParams }: Props) {
     const user = await getSignedInUser(clerkId);
 
     const data = await fetchSavedQuestions({ clerk_id: clerkId, searchQuery: q, filter });
-
+    if (JSON.parse(data).questions === 0) {
+        return (
+            <NoResults
+                title="Turns out you haven't saved any questions yet"
+                desc="Be sure to give a Question a star and you'll find it here"
+                link="/"
+                linkTitle="Explore Questions"
+            />
+        );
+    }
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7 max-sm:gap-5">
             <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">Saved Questions</h1>

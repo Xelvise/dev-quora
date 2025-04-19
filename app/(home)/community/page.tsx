@@ -27,6 +27,14 @@ export default async function Community({ searchParams }: Props) {
     const { q, filter } = await searchParams;
     const { users } = await fetchUsers({ searchQuery: q, filter });
 
+    if (users.length === 0) {
+        return (
+            <NoResults
+                title="There are no Users yet 😞"
+                desc="Why not be the first to register and earn yourself a badge? 😃"
+            />
+        );
+    }
     return (
         <main className="flex min-h-screen max-w-5xl flex-1 flex-col gap-7">
             <h1 className="h1-bold max-sm:h3-bold text-dark300_light900">All Users</h1>
@@ -39,14 +47,9 @@ export default async function Community({ searchParams }: Props) {
             </div>
 
             <section className="grid gap-5 max-xs:grid-cols-1 xs:grid-cols-2 md:grid-cols-4">
-                {users.length > 0 ? (
-                    users.map(user => <UserCard key={user.id} user={user} />)
-                ) : (
-                    <NoResults
-                        title="There are no Users yet 😞"
-                        desc="Why not be the first to register and earn yourself a badge? 😃"
-                    />
-                )}
+                {users.map(user => (
+                    <UserCard key={user.id} user={user} />
+                ))}
             </section>
         </main>
     );
