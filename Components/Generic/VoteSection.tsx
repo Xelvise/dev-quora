@@ -2,12 +2,7 @@
 
 import { formatNumber } from "@/app/utils";
 import { downvoteAnswer, upvoteAnswer } from "@/Backend/Server-Side/Actions/answer.action";
-import {
-    downvoteQuestion,
-    getPostAuthorID,
-    toggleSaveQuestion,
-    upvoteQuestion,
-} from "@/Backend/Server-Side/Actions/question.action";
+import { downvoteQuestion, toggleSaveQuestion, upvoteQuestion } from "@/Backend/Server-Side/Actions/question.action";
 import { useToast } from "@/Components/Shadcn/hooks/use-toast";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -81,7 +76,7 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                 setOptimisticUpvotes(upvotes);
                 setOptimisticDownvotes(downvotes);
             } finally {
-                setReclickState(prev => ({ ...prev, canUpvote: true }));
+                setReclickState(prev => ({ ...prev, canUpvote: true, canDownvote: true }));
             }
 
         } else if (action === "downvote") {
@@ -116,7 +111,7 @@ export default function VoteSection({ postType, post_id, userId, upvotes, downvo
                 setOptimisticDownvotes(downvotes);
                 setOptimisticUpvotes(upvotes);
             } finally {
-                setReclickState(prev => ({ ...prev, canDownvote: true }));
+                setReclickState(prev => ({ ...prev, canUpvote: true, canDownvote: true }));
             }
         };
     };

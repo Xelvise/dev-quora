@@ -144,7 +144,7 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
 
     return (
         <>
-            <div className="mt-16 flex w-full flex-wrap items-center justify-between gap-5">
+            <div className="mt-14 flex w-full flex-wrap items-center justify-between gap-5">
                 <p className="base-semibold max-sm:body-semibold text-dark200_light800">Suggest an answer</p>
                 <Button
                     type="button"
@@ -172,7 +172,10 @@ export default function AnswerForm({ signedInUserId, stringifiedQuestion }: Prop
             </div>
 
             <Form {...form}>
-                <form className="mt-5 flex w-full flex-col gap-5" onSubmit={form.handleSubmit(onSubmitAnswer)}>
+                <form
+                    className="mt-5 flex w-full flex-col gap-10 max-sm:mt-2 max-sm:gap-5"
+                    onSubmit={form.handleSubmit(onSubmitAnswer)}
+                >
                     <FormField
                         control={form.control}
                         name="answer"

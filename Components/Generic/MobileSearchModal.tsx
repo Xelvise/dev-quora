@@ -28,24 +28,10 @@ export default function MobileSearchModal() {
         return () => clearTimeout(debounceDelayFn);
     }, [searchValue]);
 
-    // Ref to track the search bar container and search results container
-    const modal = useRef<HTMLDivElement>(null);
-    // State to manage the modal open/close state
-    const [isOpen, setOpenState] = useState(false);
+    // State to control open/close of search modal
     const [dialogOpen, setDialogOpen] = useState(false);
-
-    // Close the modal on outside click, while ensuring clicks on search results or filters keeps the modal open
-    useEffect(() => {
-        const handleOutsideClick = (event: MouseEvent) => {
-            const target = event.target as Node;
-            // Check if the click is outside both the modal and the search results container
-            if (modal.current && !modal.current.contains(target)) {
-                setOpenState(false); // Close the modal
-            }
-        };
-        document.addEventListener("mousedown", handleOutsideClick);
-        return () => document.removeEventListener("mousedown", handleOutsideClick);
-    }, []);
+    // State to control open/close of search results
+    const [isOpen, setOpenState] = useState(false);
 
     // Close the modal and dialog when the pathname changes
     useEffect(() => {
@@ -81,7 +67,7 @@ export default function MobileSearchModal() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="border-none bg-white focus:outline-none dark:bg-dark-300" ref={modal}>
+            <DialogContent className="inset-0 h-full w-full border-none bg-white p-4 focus:outline-none dark:bg-dark-300">
                 <DialogTitle className="hidden">Mobile Search Modal</DialogTitle>
                 <div className="mb-5 mt-20 flex h-[50px] w-full grow items-center gap-1 rounded-[7px] bg-light-800 px-5 dark:bg-dark-500">
                     <Image

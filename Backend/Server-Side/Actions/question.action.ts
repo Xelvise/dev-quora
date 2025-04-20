@@ -444,7 +444,6 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
             }
         }
         await QuestionCollection.deleteOne({ _id: question_id });
-        if (pathToRefetch) revalidatePath(pathToRefetch);
         await UserCollection.updateMany({ saved: question_id }, { $pull: { saved: question_id } });
         await AnswerCollection.deleteMany({ question: question_id });
         await InteractionCollection.deleteMany({ question: question_id });
@@ -463,6 +462,7 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
                 await TagCollection.findByIdAndDelete(tagDoc._id);
             }
         }
+        if (pathToRefetch) revalidatePath(pathToRefetch);
     } catch (error) {
         console.log("Failed to delete question", error);
         throw new Error("Failed to delete question");

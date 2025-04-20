@@ -39,10 +39,9 @@ const DialogContent = React.forwardRef<
             ref={ref}
             className={cn(
                 "bg-background fixed z-50 gap-4 border shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-                // Mobile fullscreen styles
-                "inset-0 h-full w-full p-4",
                 // Desktop centered styles
                 "sm:left-[50%] sm:top-[50%] sm:h-auto sm:w-full sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:p-5 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]",
+                // Custom styles
                 className,
             )}
             {...props}
